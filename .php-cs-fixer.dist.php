@@ -1,8 +1,8 @@
 <?php
-
-$finder = (new PhpCsFixer\Finder())
+$finder = PhpCsFixer\Finder::create()
     ->in(__DIR__)
     ->exclude('var')
+    ->exclude('vendor')
 ;
 
 return (new PhpCsFixer\Config())
@@ -10,4 +10,4 @@ return (new PhpCsFixer\Config())
         '@Symfony' => true,
     ])
     ->setFinder($finder)
-;
+    ;
