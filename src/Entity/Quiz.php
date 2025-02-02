@@ -28,6 +28,35 @@ class Quiz
     #[ORM\Column]
     private ?int $defaultScore = null;
 
+    #[ORM\Column(name: "quiz_type", type: "integer", options: ["default" => 0])]
+    private int $quizType = 0;
+
+    public function getQuizType(): int
+    {
+        return $this->quizType;
+    }
+
+    public function setQuizType(int $quizType): static
+    {
+        $this->quizType = $quizType;
+        return $this;
+    }
+
+    public function setTimePerQuestion(?int $timePerQuestion): static
+    {
+        $this->timePerQuestion = $timePerQuestion;
+        return $this;
+    }
+
+    public function getTimePerQuestion(): ?int
+    {
+        return $this->timePerQuestion;
+    }
+
+    #[ORM\Column(type: "integer", nullable: true)]
+    private ?int $timePerQuestion = null;
+
+
     /**
      * @var Collection<int, Category>
      */
@@ -52,6 +81,8 @@ class Quiz
     #[ORM\OneToMany(targetEntity: Question::class, mappedBy: 'quiz', cascade: ['persist'])]
     private Collection $questions;
 
+
+
     #[ORM\ManyToOne(inversedBy: 'quizzes')]
     #[ORM\JoinColumn(nullable: false)]
     private ?User $creator = null;
@@ -61,7 +92,6 @@ class Quiz
      */
     #[ORM\OneToMany(targetEntity: Comment::class, mappedBy: 'quiz')]
     private Collection $comments;
-
     public function __construct()
     {
         $this->categories = new ArrayCollection();

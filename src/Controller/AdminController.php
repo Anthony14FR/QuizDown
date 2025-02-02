@@ -24,7 +24,12 @@ class AdminController extends AbstractController
     #[Route('/quiz/new', name: 'app_admin_quiz_new')]
     public function newQuiz(Request $request, EntityManagerInterface $em): Response
     {
-        $quiz = new Quiz();
+        $type = $request->query->get('type', 'base');
+        $quiz = match ($type) {
+            'timed' => new TimedQuiz(),
+            'penalty' => new PenaltyQuiz(),
+            default => new Quiz()
+        };
 
         $form = $this->createForm(QuizType::class, $quiz);
         $form->handleRequest($request);

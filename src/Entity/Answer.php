@@ -33,10 +33,9 @@ class Answer
         return $this->content;
     }
 
-    public function setContent(string $content): static
+    public function setContent(?string $content): static
     {
         $this->content = $content;
-
         return $this;
     }
 
