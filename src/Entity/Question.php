@@ -10,16 +10,19 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Entity(repositoryClass: QuestionRepository::class)]
 class Question
 {
+    public const TYPE_TRUE_FALSE = 'true_false';
+    public const TYPE_SINGLE_CHOICE = 'single_choice';
+    public const TYPE_MULTIPLE_CHOICE = 'multiple_choice';
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255, nullable: true)]
     private ?string $content = null;
 
-    #[ORM\Column(length: 255)]
-    private ?string $type = null;
+    #[ORM\Column(length: 255, nullable: true, options: ['default' => 'single'])]
+    private ?string $type = 'single';
 
     #[ORM\Column(nullable: true)]
     private ?int $difficulty = null;
@@ -33,7 +36,7 @@ class Question
     /**
      * @var Collection<int, Answer>
      */
-    #[ORM\OneToMany(targetEntity: Answer::class, mappedBy: 'question')]
+    #[ORM\OneToMany(targetEntity: Answer::class, mappedBy: 'question', cascade: ['persist'])]
     private Collection $answers;
 
     #[ORM\ManyToOne(inversedBy: 'questions')]
@@ -68,9 +71,9 @@ class Question
         return $this->type;
     }
 
-    public function setType(string $type): static
+    public function setType(?string $type): static
     {
-        $this->type = $type;
+        $this->type = $type ?? self::TYPE_SINGLE_CHOICE;
 
         return $this;
     }
@@ -157,5 +160,10 @@ class Question
         $this->quiz = $quiz;
 
         return $this;
+    }
+
+    public function isMultipleChoice(): bool
+    {
+        return $this->type === self::TYPE_MULTIPLE_CHOICE;
     }
 }

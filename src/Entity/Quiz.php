@@ -49,7 +49,7 @@ class Quiz
     /**
      * @var Collection<int, Question>
      */
-    #[ORM\OneToMany(targetEntity: Question::class, mappedBy: 'quiz')]
+    #[ORM\OneToMany(targetEntity: Question::class, mappedBy: 'quiz', cascade: ['persist'])]
     private Collection $questions;
 
     #[ORM\ManyToOne(inversedBy: 'quizzes')]
