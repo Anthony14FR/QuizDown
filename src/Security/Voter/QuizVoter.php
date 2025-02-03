@@ -2,14 +2,13 @@
 
 namespace App\Security\Voter;
 
-
 use App\Entity\Quiz;
-use App\Entity\User;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 use Symfony\Component\Security\Core\User\UserInterface;
 
-class QuizVoter extends Voter{
+class QuizVoter extends Voter
+{
     public const EDIT = 'QUIZ_EDIT';
     public const VIEW = 'QUIZ_VIEW';
     public const DELETE = 'QUIZ_DELETE';

@@ -6,7 +6,6 @@ use App\Entity\Quiz;
 use App\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Response;
-use Doctrine\ORM\EntityManagerInterface;
 
 class QuizControllerTest extends WebTestCase
 {
@@ -24,13 +23,13 @@ class QuizControllerTest extends WebTestCase
     public function testQuizList(): void
     {
         $testUser = $this->createUser();
-        
+
         $quiz = new Quiz();
         $quiz->setTitle('Test Quiz');
         $quiz->setDescription('Test Description');
         $quiz->setDefaultScore(10);
         $quiz->setCreator($testUser);
-        
+
         $this->entityManager->persist($quiz);
         $this->entityManager->flush();
 
@@ -69,16 +68,16 @@ class QuizControllerTest extends WebTestCase
                         'answers' => [
                             0 => [
                                 'content' => '4',
-                                'isCorrect' => '1'
+                                'isCorrect' => '1',
                             ],
                             1 => [
                                 'content' => '5',
-                                'isCorrect' => '0'
-                            ]
-                        ]
-                    ]
-                ]
-            ]
+                                'isCorrect' => '0',
+                            ],
+                        ],
+                    ],
+                ],
+            ],
         ];
 
         $this->client->request(
@@ -88,7 +87,7 @@ class QuizControllerTest extends WebTestCase
         );
 
         $response = $this->client->getResponse();
-        
+
         $this->assertSame(
             Response::HTTP_FOUND,
             $response->getStatusCode(),
@@ -110,10 +109,10 @@ class QuizControllerTest extends WebTestCase
         $user->setUsername('testuser');
         $user->setPassword('$2y$13$hK2qnQM3OGfqtPG0ICIq4.kJ.IxW6WZNuC0N0uGD1g9HV2h/SLS7e');
         $user->setRoles(['ROLE_USER']);
-        
+
         $this->entityManager->persist($user);
         $this->entityManager->flush();
-        
+
         return $user;
     }
 

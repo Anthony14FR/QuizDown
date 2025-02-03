@@ -154,6 +154,6 @@ class Question
 
     public function isMultipleChoice(): bool
     {
-        return $this->type === self::TYPE_MULTIPLE_CHOICE;
+        return self::TYPE_MULTIPLE_CHOICE === $this->type;
     }
 }

@@ -2,20 +2,18 @@
 
 namespace App\Controller;
 
-use App\Entity\Quiz;
-use App\Entity\TimedQuiz;
 use App\Entity\PenaltyQuiz;
-use App\Entity\Category;
-use App\Entity\Tag;
+use App\Entity\Quiz;
 use App\Entity\Submission;
 use App\Entity\SubmissionAnswer;
+use App\Entity\TimedQuiz;
 use App\Form\QuizType;
 use App\Repository\CategoryRepository;
-;use App\Repository\TagRepository;
 use App\Repository\QuizRepository;
+use App\Repository\TagRepository;
 use App\Security\Voter\QuizVoter;
-use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -28,8 +26,9 @@ class QuizController extends AbstractController
     public function __construct(
         private QuizRepository $quizRepository,
         private CategoryRepository $categoryRepository,
-        private TagRepository $tagRepository
-    ) {}
+        private TagRepository $tagRepository,
+    ) {
+    }
 
     #[Route('', name: 'app_quiz_index', methods: ['GET'])]
     public function indexQuizzes(Request $request): Response
@@ -47,8 +46,8 @@ class QuizController extends AbstractController
 
         $quizzes = $this->quizRepository->findPaginatedFilteredQuizzes($category, $tag, $order, $searchTerm, $page, $limit);
 
-        $categories =  $this->categoryRepository->findAll();
-        $tags =  $this->tagRepository->findAll();
+        $categories = $this->categoryRepository->findAll();
+        $tags = $this->tagRepository->findAll();
 
         return $this->render('quiz/index.html.twig', [
             'quizzes' => $quizzes,
@@ -60,7 +59,7 @@ class QuizController extends AbstractController
             'limit' => $limit,
             'totalPages' => $totalPages,
             'categories' => $categories,
-            'tags' => $tags
+            'tags' => $tags,
         ]);
     }
 
@@ -90,7 +89,7 @@ class QuizController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             if ($quiz instanceof TimedQuiz) {
-                $quiz->setTimeLimit($quizData['timeLimit'] ?? null); 
+                $quiz->setTimeLimit($quizData['timeLimit'] ?? null);
             }
             if ($quiz instanceof PenaltyQuiz) {
                 $quiz->setPenaltyPoints($quizData['penaltyPoints'] ?? null);
@@ -108,6 +107,7 @@ class QuizController extends AbstractController
             $entityManager->flush();
 
             $this->addFlash('success', 'Votre quiz a été créé avec succès.');
+
             return $this->redirectToRoute('app_quiz_index');
         }
 
@@ -126,7 +126,7 @@ class QuizController extends AbstractController
         foreach ($quiz->getQuestions() as $question) {
             $originalQuestions->add($question);
         }
-    
+
         $originalAnswers = new ArrayCollection();
         foreach ($quiz->getQuestions() as $question) {
             foreach ($question->getAnswers() as $answer) {
@@ -140,7 +140,7 @@ class QuizController extends AbstractController
             'penalty_points' => $quiz instanceof PenaltyQuiz ? $quiz->getPenaltyPoints() : null,
             'time_penalty' => $quiz instanceof PenaltyQuiz ? $quiz->getTimePenalty() : null,
         ]);
-        
+
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -149,7 +149,7 @@ class QuizController extends AbstractController
                     $entityManager->remove($question);
                 }
             }
-    
+
             foreach ($originalAnswers as $answer) {
                 $found = false;
                 foreach ($quiz->getQuestions() as $question) {
@@ -158,7 +158,7 @@ class QuizController extends AbstractController
                         break;
                     }
                 }
-    
+
                 if (!$found) {
                     $entityManager->remove($answer);
                 }
@@ -166,19 +166,19 @@ class QuizController extends AbstractController
 
             if ($quiz instanceof TimedQuiz) {
                 $timeLimit = $form->get('timeLimit')->getData();
-                if ($timeLimit !== null) {
+                if (null !== $timeLimit) {
                     $quiz->setTimeLimit($timeLimit);
                 }
             }
-        
+
             if ($quiz instanceof PenaltyQuiz) {
                 $penaltyPoints = $form->get('penaltyPoints')->getData();
                 $timePenalty = $form->get('timePenalty')->getData();
-        
-                if ($penaltyPoints !== null) {
+
+                if (null !== $penaltyPoints) {
                     $quiz->setPenaltyPoints($penaltyPoints);
                 }
-                if ($timePenalty !== null) {
+                if (null !== $timePenalty) {
                     $quiz->setTimePenalty($timePenalty);
                 }
             }
@@ -193,16 +193,17 @@ class QuizController extends AbstractController
                     $tag->addQuiz($quiz);
                 }
             }
-            
+
             $entityManager->flush();
 
             $this->addFlash('success', 'Le quiz a été modifié avec succès.');
+
             return $this->redirectToRoute('app_quiz_index');
         }
 
         return $this->render('quiz/edit.html.twig', [
             'form' => $form,
-            'quiz' => $quiz
+            'quiz' => $quiz,
         ]);
     }
 
@@ -228,11 +229,11 @@ class QuizController extends AbstractController
             'groups' => ['quiz:read:full'],
             'circular_reference_handler' => function ($object) {
                 return $object->getId();
-            }
+            },
         ]), true);
-    
+
         return $this->render('quiz/play.html.twig', [
-            'quiz' => $quizData
+            'quiz' => $quizData,
         ]);
     }
 
@@ -257,14 +258,14 @@ class QuizController extends AbstractController
 
             $isCorrect = false;
             foreach ($question->getAnswers() as $answer) {
-                if ($question->getType() === 'true_false' || $question->getType() === 'single_choice') {
+                if ('true_false' === $question->getType() || 'single_choice' === $question->getType()) {
                     if ($answer->getId() == $userAnswer && $answer->isCorrect()) {
                         $isCorrect = true;
                         $score += $quiz->getDefaultScore();
                     }
-                } elseif ($question->getType() === 'multiple_choice') {
+                } elseif ('multiple_choice' === $question->getType()) {
                     $userAnswers = is_array($userAnswer) ? $userAnswer : [];
-                    $correctAnswers = $question->getAnswers()->filter(fn($a) => $a->isCorrect())->map(fn($a) => $a->getId())->toArray();
+                    $correctAnswers = $question->getAnswers()->filter(fn ($a) => $a->isCorrect())->map(fn ($a) => $a->getId())->toArray();
                     if ($userAnswers == $correctAnswers) {
                         $isCorrect = true;
                         $score += $quiz->getDefaultScore();
@@ -287,7 +288,7 @@ class QuizController extends AbstractController
     public function result(Submission $submission): Response
     {
         return $this->render('quiz/result.html.twig', [
-            'submission' => $submission
+            'submission' => $submission,
         ]);
     }
 }

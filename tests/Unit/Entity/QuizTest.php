@@ -2,9 +2,8 @@
 
 namespace App\Tests\Unit\Entity;
 
-use App\Entity\Quiz;
 use App\Entity\Question;
-use App\Entity\User;
+use App\Entity\Quiz;
 use PHPUnit\Framework\TestCase;
 
 class QuizTest extends TestCase
@@ -41,7 +40,7 @@ class QuizTest extends TestCase
     {
         $score = 10;
         $this->quiz->setDefaultScore($score);
-        
+
         $this->assertEquals($score, $this->quiz->getDefaultScore());
     }
 }
