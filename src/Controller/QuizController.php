@@ -5,9 +5,13 @@ namespace App\Controller;
 use App\Entity\Quiz;
 use App\Entity\TimedQuiz;
 use App\Entity\PenaltyQuiz;
+use App\Entity\Category;
+use App\Entity\Tag;
 use App\Entity\Submission;
 use App\Entity\SubmissionAnswer;
 use App\Form\QuizType;
+use App\Repository\CategoryRepository;
+;use App\Repository\TagRepository;
 use App\Repository\QuizRepository;
 use App\Security\Voter\QuizVoter;
 use Doctrine\ORM\EntityManagerInterface;
@@ -22,16 +26,41 @@ use Symfony\Component\Serializer\SerializerInterface;
 class QuizController extends AbstractController
 {
     public function __construct(
-        private QuizRepository $quizRepository
+        private QuizRepository $quizRepository,
+        private CategoryRepository $categoryRepository,
+        private TagRepository $tagRepository
     ) {}
 
     #[Route('', name: 'app_quiz_index', methods: ['GET'])]
-    public function indexQuizzes(): Response
+    public function indexQuizzes(Request $request): Response
     {
-        $quizzes = $this->quizRepository->findAll();
-        
+        $category = $request->query->get('category');
+        $tag = $request->query->get('tag');
+        $order = $request->query->get('order', 'desc');
+        $searchTerm = $request->query->get('q', '');
+        $page = max((int) $request->query->get('page', 1), 1);
+        $limit = max((int) $request->query->get('limit', 5), 1);
+
+        $totalQuizzes = $this->quizRepository->countFilteredQuizzes($category, $tag, $searchTerm);
+
+        $totalPages = (int) ceil($totalQuizzes / $limit);
+
+        $quizzes = $this->quizRepository->findPaginatedFilteredQuizzes($category, $tag, $order, $searchTerm, $page, $limit);
+
+        $categories =  $this->categoryRepository->findAll();
+        $tags =  $this->tagRepository->findAll();
+
         return $this->render('quiz/index.html.twig', [
-            'quizzes' => $quizzes
+            'quizzes' => $quizzes,
+            'category' => $category,
+            'tag' => $tag,
+            'order' => $order,
+            'searchTerm' => $searchTerm,
+            'page' => $page,
+            'limit' => $limit,
+            'totalPages' => $totalPages,
+            'categories' => $categories,
+            'tags' => $tags
         ]);
     }
 
@@ -68,6 +97,13 @@ class QuizController extends AbstractController
                 $quiz->setTimePenalty($quizData['timePenalty'] ?? null);
             }
 
+            foreach ($quiz->getCategories() as $category) {
+                $category->addQuiz($quiz);
+            }
+            foreach ($quiz->getTags() as $tag) {
+                $tag->addQuiz($quiz);
+            }
+
             $entityManager->persist($quiz);
             $entityManager->flush();
 
@@ -77,7 +113,7 @@ class QuizController extends AbstractController
 
         return $this->render('quiz/new.html.twig', [
             'form' => $form,
-            'quiz' => $quiz
+            'quiz' => $quiz,
         ]);
     }
 
@@ -144,6 +180,17 @@ class QuizController extends AbstractController
                 }
                 if ($timePenalty !== null) {
                     $quiz->setTimePenalty($timePenalty);
+                }
+            }
+
+            foreach ($quiz->getCategories() as $category) {
+                if (!$category->getQuizzes()->contains($quiz)) {
+                    $category->addQuiz($quiz);
+                }
+            }
+            foreach ($quiz->getTags() as $tag) {
+                if (!$tag->getQuizzes()->contains($quiz)) {
+                    $tag->addQuiz($quiz);
                 }
             }
             
