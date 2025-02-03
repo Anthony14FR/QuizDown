@@ -7,8 +7,11 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Gedmo\Mapping\Annotation as Gedmo;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: QuizRepository::class)]
+#[ORM\HasLifecycleCallbacks]
 #[ORM\InheritanceType('JOINED')]
 #[ORM\DiscriminatorColumn(name: 'type', type: 'string')]
 #[ORM\DiscriminatorMap(['base' => Quiz::class, 'timed' => TimedQuiz::class, 'penalty' => PenaltyQuiz::class])]
@@ -17,15 +20,19 @@ class Quiz
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    private ?int $id = null;
+    #[Groups(['quiz:read:full'])]
+    protected ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['quiz:read:full'])]
     private ?string $title = null;
 
     #[ORM\Column(type: Types::TEXT)]
+    #[Groups(['quiz:read:full'])]
     private ?string $description = null;
 
     #[ORM\Column]
+    #[Groups(['quiz:read'])]
     private ?int $defaultScore = null;
 
     #[ORM\Column(name: "quiz_type", type: "integer", options: ["default" => 0])]
@@ -60,38 +67,41 @@ class Quiz
     /**
      * @var Collection<int, Category>
      */
-    #[ORM\ManyToMany(targetEntity: Category::class, mappedBy: 'quizzes')]
+    #[ORM\ManyToMany(targetEntity: Category::class, mappedBy: 'quizzes', cascade: ['persist'])]
     private Collection $categories;
 
     /**
      * @var Collection<int, Tag>
      */
-    #[ORM\ManyToMany(targetEntity: Tag::class, mappedBy: 'quizzes')]
+    #[ORM\ManyToMany(targetEntity: Tag::class, mappedBy: 'quizzes', cascade: ['persist'])]
     private Collection $tags;
 
     /**
      * @var Collection<int, Submission>
      */
-    #[ORM\OneToMany(targetEntity: Submission::class, mappedBy: 'quiz')]
+    #[ORM\OneToMany(targetEntity: Submission::class, mappedBy: 'quiz', cascade: ['remove'])]
     private Collection $submissions;
 
     /**
      * @var Collection<int, Question>
      */
-    #[ORM\OneToMany(targetEntity: Question::class, mappedBy: 'quiz', cascade: ['persist'])]
+    #[ORM\OneToMany(targetEntity: Question::class, mappedBy: 'quiz', cascade: ['persist', 'remove'])]
+    #[Groups(['quiz:read:full'])]
     private Collection $questions;
 
 
 
     #[ORM\ManyToOne(inversedBy: 'quizzes')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['quiz:read'])]
     private ?User $creator = null;
 
     /**
      * @var Collection<int, Comment>
      */
-    #[ORM\OneToMany(targetEntity: Comment::class, mappedBy: 'quiz')]
+    #[ORM\OneToMany(targetEntity: Comment::class, mappedBy: 'quiz', cascade: ['remove'])]
     private Collection $comments;
+  
     public function __construct()
     {
         $this->categories = new ArrayCollection();
@@ -296,5 +306,51 @@ class Quiz
         }
 
         return $this;
+    }
+
+    public function getType(): string
+    {
+        return match (true) {
+            $this instanceof TimedQuiz => 'timed',
+            $this instanceof PenaltyQuiz => 'penalty',
+            default => 'base',
+        };
+    }
+
+    public function getCreatedAt(): ?\DateTime
+    {
+        return $this->createdAt;
+    }
+
+    public function setCreatedAt(\DateTime $createdAt): self
+    {
+        $this->createdAt = $createdAt;
+        return $this;
+    }
+
+    public function getUpdatedAt(): ?\DateTime
+    {
+        return $this->updatedAt;
+    }
+
+    public function setUpdatedAt(\DateTime $updatedAt): self
+    {
+        $this->updatedAt = $updatedAt;
+        return $this;
+    }
+
+    #[ORM\PrePersist]
+    public function setCreatedAtValue(): void
+    {
+        if ($this->createdAt === null) {
+            $this->createdAt = new \DateTime();
+        }
+        $this->updatedAt = new \DateTime();
+    }
+
+    #[ORM\PreUpdate]
+    public function setUpdatedAtValue(): void
+    {
+        $this->updatedAt = new \DateTime();
     }
 }

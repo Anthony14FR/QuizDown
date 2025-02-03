@@ -3,22 +3,236 @@
 namespace App\Controller;
 
 use App\Entity\Quiz;
+use App\Entity\TimedQuiz;
+use App\Entity\PenaltyQuiz;
+use App\Entity\Category;
+use App\Entity\Tag;
 use App\Entity\Submission;
 use App\Entity\SubmissionAnswer;
+use App\Form\QuizType;
+use App\Repository\CategoryRepository;
+;use App\Repository\TagRepository;
+use App\Repository\QuizRepository;
+use App\Security\Voter\QuizVoter;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Serializer\SerializerInterface;
 
 #[Route('/quiz')]
 class QuizController extends AbstractController
 {
-    #[Route('/{id}/play', name: 'app_quiz_play')]
-    public function play(Quiz $quiz): Response
+    public function __construct(
+        private QuizRepository $quizRepository,
+        private CategoryRepository $categoryRepository,
+        private TagRepository $tagRepository
+    ) {}
+
+    #[Route('', name: 'app_quiz_index', methods: ['GET'])]
+    public function indexQuizzes(Request $request): Response
     {
-        return $this->render('quiz/play.html.twig', [
+        $category = $request->query->get('category');
+        $tag = $request->query->get('tag');
+        $order = $request->query->get('order', 'desc');
+        $searchTerm = $request->query->get('q', '');
+        $page = max((int) $request->query->get('page', 1), 1);
+        $limit = max((int) $request->query->get('limit', 5), 1);
+
+        $totalQuizzes = $this->quizRepository->countFilteredQuizzes($category, $tag, $searchTerm);
+
+        $totalPages = (int) ceil($totalQuizzes / $limit);
+
+        $quizzes = $this->quizRepository->findPaginatedFilteredQuizzes($category, $tag, $order, $searchTerm, $page, $limit);
+
+        $categories =  $this->categoryRepository->findAll();
+        $tags =  $this->tagRepository->findAll();
+
+        return $this->render('quiz/index.html.twig', [
+            'quizzes' => $quizzes,
+            'category' => $category,
+            'tag' => $tag,
+            'order' => $order,
+            'searchTerm' => $searchTerm,
+            'page' => $page,
+            'limit' => $limit,
+            'totalPages' => $totalPages,
+            'categories' => $categories,
+            'tags' => $tags
+        ]);
+    }
+
+    #[Route('/new', name: 'app_quiz_new', methods: ['GET', 'POST'])]
+    public function new(Request $request, EntityManagerInterface $entityManager): Response
+    {
+        $this->denyAccessUnlessGranted('ROLE_USER');
+
+        $quizData = $request->request->all('quiz');
+        $quizType = $quizData['type'] ?? $request->query->get('type', 'base');
+
+        switch ($quizType) {
+            case 'timed':
+                $quiz = new TimedQuiz();
+                break;
+            case 'penalty':
+                $quiz = new PenaltyQuiz();
+                break;
+            default:
+                $quiz = new Quiz();
+        }
+
+        $quiz->setCreator($this->getUser());
+
+        $form = $this->createForm(QuizType::class, $quiz);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            if ($quiz instanceof TimedQuiz) {
+                $quiz->setTimeLimit($quizData['timeLimit'] ?? null); 
+            }
+            if ($quiz instanceof PenaltyQuiz) {
+                $quiz->setPenaltyPoints($quizData['penaltyPoints'] ?? null);
+                $quiz->setTimePenalty($quizData['timePenalty'] ?? null);
+            }
+
+            foreach ($quiz->getCategories() as $category) {
+                $category->addQuiz($quiz);
+            }
+            foreach ($quiz->getTags() as $tag) {
+                $tag->addQuiz($quiz);
+            }
+
+            $entityManager->persist($quiz);
+            $entityManager->flush();
+
+            $this->addFlash('success', 'Votre quiz a été créé avec succès.');
+            return $this->redirectToRoute('app_quiz_index');
+        }
+
+        return $this->render('quiz/new.html.twig', [
+            'form' => $form,
+            'quiz' => $quiz,
+        ]);
+    }
+
+    #[Route('/{id}/edit', name: 'app_quiz_edit', methods: ['GET', 'POST'])]
+    public function edit(Quiz $quiz, Request $request, EntityManagerInterface $entityManager): Response
+    {
+        $this->denyAccessUnlessGranted(QuizVoter::EDIT, $quiz);
+
+        $originalQuestions = new ArrayCollection();
+        foreach ($quiz->getQuestions() as $question) {
+            $originalQuestions->add($question);
+        }
+    
+        $originalAnswers = new ArrayCollection();
+        foreach ($quiz->getQuestions() as $question) {
+            foreach ($question->getAnswers() as $answer) {
+                $originalAnswers->add($answer);
+            }
+        }
+
+        $form = $this->createForm(QuizType::class, $quiz, [
+            'quiz_type' => $quiz->getType(),
+            'time_limit' => $quiz instanceof TimedQuiz ? $quiz->getTimeLimit() : null,
+            'penalty_points' => $quiz instanceof PenaltyQuiz ? $quiz->getPenaltyPoints() : null,
+            'time_penalty' => $quiz instanceof PenaltyQuiz ? $quiz->getTimePenalty() : null,
+        ]);
+        
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            foreach ($originalQuestions as $question) {
+                if (!$quiz->getQuestions()->contains($question)) {
+                    $entityManager->remove($question);
+                }
+            }
+    
+            foreach ($originalAnswers as $answer) {
+                $found = false;
+                foreach ($quiz->getQuestions() as $question) {
+                    if ($question->getAnswers()->contains($answer)) {
+                        $found = true;
+                        break;
+                    }
+                }
+    
+                if (!$found) {
+                    $entityManager->remove($answer);
+                }
+            }
+
+            if ($quiz instanceof TimedQuiz) {
+                $timeLimit = $form->get('timeLimit')->getData();
+                if ($timeLimit !== null) {
+                    $quiz->setTimeLimit($timeLimit);
+                }
+            }
+        
+            if ($quiz instanceof PenaltyQuiz) {
+                $penaltyPoints = $form->get('penaltyPoints')->getData();
+                $timePenalty = $form->get('timePenalty')->getData();
+        
+                if ($penaltyPoints !== null) {
+                    $quiz->setPenaltyPoints($penaltyPoints);
+                }
+                if ($timePenalty !== null) {
+                    $quiz->setTimePenalty($timePenalty);
+                }
+            }
+
+            foreach ($quiz->getCategories() as $category) {
+                if (!$category->getQuizzes()->contains($quiz)) {
+                    $category->addQuiz($quiz);
+                }
+            }
+            foreach ($quiz->getTags() as $tag) {
+                if (!$tag->getQuizzes()->contains($quiz)) {
+                    $tag->addQuiz($quiz);
+                }
+            }
+            
+            $entityManager->flush();
+
+            $this->addFlash('success', 'Le quiz a été modifié avec succès.');
+            return $this->redirectToRoute('app_quiz_index');
+        }
+
+        return $this->render('quiz/edit.html.twig', [
+            'form' => $form,
             'quiz' => $quiz
+        ]);
+    }
+
+    #[Route('/{id}/delete', name: 'app_quiz_delete', methods: ['POST'])]
+    public function delete(Quiz $quiz, Request $request, EntityManagerInterface $entityManager): Response
+    {
+        $this->denyAccessUnlessGranted(QuizVoter::DELETE, $quiz);
+
+        if ($this->isCsrfTokenValid('delete'.$quiz->getId(), $request->request->get('_token'))) {
+            $entityManager->remove($quiz);
+            $entityManager->flush();
+
+            $this->addFlash('success', 'Le quiz a été supprimé avec succès.');
+        }
+
+        return $this->redirectToRoute('app_quiz_index');
+    }
+
+    #[Route('/{id}/play', name: 'app_quiz_play')]
+    public function play(Quiz $quiz, SerializerInterface $serializer): Response
+    {
+        $quizData = json_decode($serializer->serialize($quiz, 'json', [
+            'groups' => ['quiz:read:full'],
+            'circular_reference_handler' => function ($object) {
+                return $object->getId();
+            }
+        ]), true);
+    
+        return $this->render('quiz/play.html.twig', [
+            'quiz' => $quizData
         ]);
     }
 

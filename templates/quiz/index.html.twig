@@ -1,20 +1,99 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Hello QuizController!{% endblock %}
-
 {% block body %}
-<style>
-    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
-    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
-</style>
+<div class="container mx-auto px-4">
+    <div class="flex justify-between items-center mb-6">
+        <h1 class="text-3xl font-bold">Nos Quiz</h1>
+        {% if is_granted('ROLE_USER') %}
+            <a href="{{ path('app_quiz_new') }}" class="btn btn-primary">
+                Créer un nouveau quiz
+            </a>
+        {% endif %}
+    </div>
 
-<div class="example-wrapper">
-    <h1>Hello {{ controller_name }}! ✅</h1>
+    <form method="GET" action="{{ path('app_quiz_index') }}" class="mb-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+    <input type="text" name="q" placeholder="Rechercher un quiz..." value="{{ searchTerm }}" class="input input-bordered w-full">
+    
+    <select name="category" class="select select-bordered w-full">
+        <option value="">Toutes les catégories</option>
+        {% for cat in categories %}
+            <option value="{{ cat.name }}" {% if category == cat.name %}selected{% endif %}>{{ cat.name }}</option>
+        {% endfor %}
+    </select>
 
-    This friendly message is coming from:
-    <ul>
-        <li>Your controller at <code>D:/QuizDown/src/Controller/QuizController.php</code></li>
-        <li>Your template at <code>D:/QuizDown/templates/quiz/index.html.twig</code></li>
-    </ul>
+    <select name="tag" class="select select-bordered w-full">
+        <option value="">Tous les tags</option>
+        {% for t in tags %}
+            <option value="{{ t.name }}" {% if tag == t.name %}selected{% endif %}>{{ t.name }}</option>
+        {% endfor %}
+    </select>
+
+    <select name="order" class="select select-bordered w-full">
+        <option value="desc" {% if order == 'desc' %}selected{% endif %}>Plus récents</option>
+        <option value="asc" {% if order == 'asc' %}selected{% endif %}>Plus anciens</option>
+    </select>
+
+    <button type="submit" class="btn btn-primary w-full">Filtrer</button>
+</form>
+
+    {# LISTE DES QUIZZES #}
+    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {% for quiz in quizzes %}
+            <div class="card bg-base-100 shadow-xl">
+                <div class="card-body">
+                    <h2 class="card-title">{{ quiz.title }}</h2>
+                    <p class="text-sm text-gray-600">{{ quiz.description|slice(0, 100) }}{% if quiz.description|length > 100 %}...{% endif %}</p>
+                    
+                    <div class="text-sm text-gray-500 mb-4">
+                        <div>Créé par {{ quiz.creator.username }}</div>
+                        <div>{{ quiz.questions|length }} question(s)</div>
+                    </div>
+
+                    <div class="card-actions justify-between items-center">
+                        <a href="{{ path('app_quiz_play', {'id': quiz.getId()}) }}" class="btn btn-primary btn-sm">
+                            Commencer le quiz
+                        </a>
+
+                        {% if is_granted(constant('App\\Security\\Voter\\QuizVoter::EDIT'), quiz) %}
+                            <div class="flex items-center space-x-2">
+                                <a href="{{ path('app_quiz_edit', {'id': quiz.id}) }}" class="btn btn-ghost btn-sm">
+                                    Modifier
+                                </a>
+                                
+                               <form method="post" action="{{ path('app_quiz_delete', {'id': quiz.id}) }}" class="inline" 
+                                    onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce quiz ?');">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ quiz.id) }}">
+                                    <button type="submit" class="btn btn-ghost btn-sm text-error">
+                                        Supprimer
+                                    </button>
+                                </form>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        {% else %}
+            <div class="col-span-full text-center text-gray-500">
+                <p>Aucun quiz trouvé.</p>
+            </div>
+        {% endfor %}
+    </div>
+
+    {# PAGINATION #}
+    <div class="pagination mt-6 flex justify-center space-x-4">
+        {% if page > 1 %}
+            <a href="{{ path('app_quiz_index', { 'page': page - 1, 'limit': limit, 'category': category, 'tag': tag, 'order': order, 'q': searchTerm }) }}" 
+            class="btn btn-primary">
+                Précédent
+            </a>
+        {% endif %}
+
+        {% if page < totalPages %}
+            <a href="{{ path('app_quiz_index', { 'page': page + 1, 'limit': limit, 'category': category, 'tag': tag, 'order': order, 'q': searchTerm }) }}" 
+            class="btn btn-primary">
+                Suivant
+            </a>
+        {% endif %}
+    </div>
 </div>
 {% endblock %}
