@@ -30,11 +30,13 @@ class AIQuizController extends AbstractController
 
         if (empty($theme)) {
             $this->addFlash('error', 'Le thème est obligatoire');
+
             return $this->redirectToRoute('app_quiz_ai_new');
         }
 
         if ($questionCount < 1 || $questionCount > 20) {
             $this->addFlash('error', 'Le nombre de questions doit être entre 1 et 20');
+
             return $this->redirectToRoute('app_quiz_ai_new');
         }
 

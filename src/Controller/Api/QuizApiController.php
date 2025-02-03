@@ -10,16 +10,16 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Serializer\SerializerInterface;
-use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 
 #[Route('/api/quiz', name: 'api_quiz_')]
-class QuizApiController extends AbstractController{
+class QuizApiController extends AbstractController
+{
     public function __construct(
         private QuizRepository $quizRepository,
         private SerializerInterface $serializer,
-        private EntityManagerInterface $em
-    ) 
-    {}
+        private EntityManagerInterface $em,
+    ) {
+    }
 
     #[Route('', name: 'index', methods: ['GET'])]
     public function getAllQuizzes(): JsonResponse
@@ -30,7 +30,7 @@ class QuizApiController extends AbstractController{
             'groups' => ['quiz:read'],
             'circular_reference_handler' => function ($object) {
                 return $object->getId();
-            }
+            },
         ]);
 
         return new JsonResponse($json, Response::HTTP_OK, [], true);
@@ -43,7 +43,7 @@ class QuizApiController extends AbstractController{
             'groups' => ['quiz:read', 'quiz:read:full'],
             'circular_reference_handler' => function ($object) {
                 return $object->getId();
-            }
+            },
         ]);
 
         return new JsonResponse($json, Response::HTTP_OK, [], true);

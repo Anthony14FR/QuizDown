@@ -15,23 +15,23 @@ class AnswerType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add('content', TextType::class, [
-            'label' => 'Réponse'
+            'label' => 'Réponse',
         ]);
 
         if ($options['is_true_false']) {
             $builder->add('isCorrect', RadioType::class, [
                 'required' => false,
-                'label' => 'Bonne réponse'
+                'label' => 'Bonne réponse',
             ]);
-        } else if ($options['is_multiple']) {
+        } elseif ($options['is_multiple']) {
             $builder->add('isCorrect', CheckboxType::class, [
                 'required' => false,
-                'label' => 'Bonne réponse'
+                'label' => 'Bonne réponse',
             ]);
         } else {
             $builder->add('isCorrect', RadioType::class, [
                 'required' => false,
-                'label' => 'Bonne réponse'
+                'label' => 'Bonne réponse',
             ]);
         }
     }
@@ -41,7 +41,7 @@ class AnswerType extends AbstractType
         $resolver->setDefaults([
             'data_class' => Answer::class,
             'is_true_false' => false,
-            'is_multiple' => false
+            'is_multiple' => false,
         ]);
     }
 }

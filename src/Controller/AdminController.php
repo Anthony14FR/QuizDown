@@ -3,13 +3,13 @@
 namespace App\Controller;
 
 use App\Entity\Category;
-use App\Entity\TimedQuiz;
 use App\Entity\PenaltyQuiz;
 use App\Entity\Quiz;
 use App\Entity\Tag;
+use App\Entity\TimedQuiz;
 use App\Form\CategoryType;
-use App\Form\TagType;
 use App\Form\QuizType;
+use App\Form\TagType;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -50,7 +50,7 @@ class AdminController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             if ($quiz instanceof TimedQuiz) {
-                $quiz->setTimeLimit($quizData['timeLimit'] ?? null); 
+                $quiz->setTimeLimit($quizData['timeLimit'] ?? null);
             }
             if ($quiz instanceof PenaltyQuiz) {
                 $quiz->setPenaltyPoints($quizData['penaltyPoints'] ?? null);
@@ -62,6 +62,7 @@ class AdminController extends AbstractController
             $em->flush();
 
             $this->addFlash('success', 'Quiz créé avec succès');
+
             return $this->redirectToRoute('app_admin_quiz_list');
         }
 
@@ -76,7 +77,7 @@ class AdminController extends AbstractController
         $quizzes = $em->getRepository(Quiz::class)->findAll();
 
         return $this->render('admin/quiz/list.html.twig', [
-            'quizzes' => $quizzes
+            'quizzes' => $quizzes,
         ]);
     }
 
@@ -87,7 +88,7 @@ class AdminController extends AbstractController
         foreach ($quiz->getQuestions() as $question) {
             $originalQuestions->add($question);
         }
-    
+
         $originalAnswers = new ArrayCollection();
         foreach ($quiz->getQuestions() as $question) {
             foreach ($question->getAnswers() as $answer) {
@@ -110,7 +111,7 @@ class AdminController extends AbstractController
                     $em->remove($question);
                 }
             }
-    
+
             foreach ($originalAnswers as $answer) {
                 $found = false;
                 foreach ($quiz->getQuestions() as $question) {
@@ -119,7 +120,7 @@ class AdminController extends AbstractController
                         break;
                     }
                 }
-    
+
                 if (!$found) {
                     $em->remove($answer);
                 }
@@ -127,31 +128,32 @@ class AdminController extends AbstractController
 
             if ($quiz instanceof TimedQuiz) {
                 $timeLimit = $form->get('timeLimit')->getData();
-                if ($timeLimit !== null) {
+                if (null !== $timeLimit) {
                     $quiz->setTimeLimit($timeLimit);
                 }
             }
-        
+
             if ($quiz instanceof PenaltyQuiz) {
                 $penaltyPoints = $form->get('penaltyPoints')->getData();
                 $timePenalty = $form->get('timePenalty')->getData();
-        
-                if ($penaltyPoints !== null) {
+
+                if (null !== $penaltyPoints) {
                     $quiz->setPenaltyPoints($penaltyPoints);
                 }
-                if ($timePenalty !== null) {
+                if (null !== $timePenalty) {
                     $quiz->setTimePenalty($timePenalty);
                 }
             }
 
             $em->flush();
             $this->addFlash('success', 'Quiz modifié avec succès');
+
             return $this->redirectToRoute('app_admin_quiz_list');
         }
 
         return $this->render('admin/quiz/edit.html.twig', [
             'form' => $form,
-            'quiz' => $quiz
+            'quiz' => $quiz,
         ]);
     }
 
@@ -163,7 +165,7 @@ class AdminController extends AbstractController
             $em->flush();
             $this->addFlash('success', 'Quiz supprimé avec succès');
         }
-        
+
         return $this->redirectToRoute('app_admin_quiz_list');
     }
 
@@ -173,7 +175,7 @@ class AdminController extends AbstractController
         $categories = $em->getRepository(Category::class)->findAll();
 
         return $this->render('admin/category/list.html.twig', [
-            'categories' => $categories
+            'categories' => $categories,
         ]);
     }
 
@@ -190,12 +192,13 @@ class AdminController extends AbstractController
             $em->flush();
 
             $this->addFlash('success', 'Catégorie créée avec succès');
+
             return $this->redirectToRoute('app_admin_category_list');
         }
 
         return $this->render('admin/category/form.html.twig', [
             'form' => $form,
-            'is_edit' => false
+            'is_edit' => false,
         ]);
     }
 
@@ -208,14 +211,15 @@ class AdminController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $em->flush();
             $this->addFlash('success', 'Catégorie modifiée avec succès');
+
             return $this->redirectToRoute('app_admin_category_list');
         }
 
         return $this->render('admin/category/form.html.twig', [
-        'form' => $form,
-        'is_edit' => true,
-        'category' => $category
-    ]);
+            'form' => $form,
+            'is_edit' => true,
+            'category' => $category,
+        ]);
     }
 
     #[Route('/category/{id}/delete', name: 'app_admin_category_delete', methods: ['POST'])]
@@ -226,6 +230,7 @@ class AdminController extends AbstractController
             $em->flush();
             $this->addFlash('success', 'Catégorie supprimée avec succès');
         }
+
         return $this->redirectToRoute('app_admin_category_list');
     }
 
@@ -235,7 +240,7 @@ class AdminController extends AbstractController
         $tags = $em->getRepository(Tag::class)->findAll();
 
         return $this->render('admin/tag/list.html.twig', [
-            'tags' => $tags
+            'tags' => $tags,
         ]);
     }
 
@@ -252,12 +257,13 @@ class AdminController extends AbstractController
             $em->flush();
 
             $this->addFlash('success', 'Tag créé avec succès');
+
             return $this->redirectToRoute('app_admin_tag_list');
         }
 
         return $this->render('admin/tag/form.html.twig', [
             'form' => $form,
-            'is_edit' => false
+            'is_edit' => false,
         ]);
     }
 
@@ -270,13 +276,14 @@ class AdminController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $em->flush();
             $this->addFlash('success', 'Tag modifié avec succès');
+
             return $this->redirectToRoute('app_admin_tag_list');
         }
-        
+
         return $this->render('admin/tag/form.html.twig', [
             'form' => $form,
             'is_edit' => true,
-            'tag' => $tag
+            'tag' => $tag,
         ]);
     }
 
@@ -288,6 +295,7 @@ class AdminController extends AbstractController
             $em->flush();
             $this->addFlash('success', 'Tag supprimé avec succès');
         }
+
         return $this->redirectToRoute('app_admin_tag_list');
     }
 }

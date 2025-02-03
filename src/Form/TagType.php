@@ -15,7 +15,7 @@ class TagType extends AbstractType
         $builder
             ->add('name', TextType::class, [
                 'label' => 'Nom',
-                'attr' => ['class' => 'input input-bordered w-full']
+                'attr' => ['class' => 'input input-bordered w-full'],
             ])
         ;
     }

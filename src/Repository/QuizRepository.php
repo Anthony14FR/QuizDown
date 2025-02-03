@@ -14,12 +14,12 @@ class QuizRepository extends ServiceEntityRepository
     }
 
     public function findPaginatedFilteredQuizzes(
-        ?string $category = null, 
-        ?string $tag = null, 
-        ?string $order = 'desc', 
-        ?string $searchTerm = '', 
-        int $page = 1, 
-        int $limit = 9
+        ?string $category = null,
+        ?string $tag = null,
+        ?string $order = 'desc',
+        ?string $searchTerm = '',
+        int $page = 1,
+        int $limit = 9,
     ) {
         $qb = $this->createQueryBuilder('q')
             ->leftJoin('q.categories', 'c')
@@ -38,7 +38,7 @@ class QuizRepository extends ServiceEntityRepository
 
         if (!empty($searchTerm)) {
             $qb->andWhere('q.title LIKE :searchTerm OR q.description LIKE :searchTerm')
-               ->setParameter('searchTerm', '%' . $searchTerm . '%');
+               ->setParameter('searchTerm', '%'.$searchTerm.'%');
         }
 
         $order = in_array(strtolower($order), ['asc', 'desc']) ? $order : 'desc';
@@ -69,7 +69,7 @@ class QuizRepository extends ServiceEntityRepository
 
         if (!empty($searchTerm)) {
             $qb->andWhere('q.title LIKE :searchTerm OR q.description LIKE :searchTerm')
-               ->setParameter('searchTerm', '%' . $searchTerm . '%');
+               ->setParameter('searchTerm', '%'.$searchTerm.'%');
         }
 
         return (int) $qb->getQuery()->getSingleScalarResult();
