@@ -6,6 +6,9 @@ use App\Entity\Quiz;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
+/**
+ * @extends ServiceEntityRepository<Quiz>
+ */
 class QuizRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
@@ -13,6 +16,9 @@ class QuizRepository extends ServiceEntityRepository
         parent::__construct($registry, Quiz::class);
     }
 
+    /**
+     * @return Quiz[]
+     */
     public function findPaginatedFilteredQuizzes(
         ?string $category = null,
         ?string $tag = null,
@@ -20,7 +26,7 @@ class QuizRepository extends ServiceEntityRepository
         ?string $searchTerm = '',
         int $page = 1,
         int $limit = 9,
-    ) {
+    ): array {
         $qb = $this->createQueryBuilder('q')
             ->leftJoin('q.categories', 'c')
             ->leftJoin('q.tags', 't')
