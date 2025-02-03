@@ -3,8 +3,13 @@ module.exports = {
     "./assets/**/*.js",
     "./templates/**/*.html.twig",
   ],
-  theme: {
-    extend: {},
-  },
   plugins: [require("daisyui")],
+
+  daisyui: {
+    themes: [
+      "emerald",
+      "halloween",
+    ],
+  },
+
 }
