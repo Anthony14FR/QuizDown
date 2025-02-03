@@ -1,23 +1,28 @@
 <!DOCTYPE html>
 {% if app.user %}
-<html data-theme="{{ app.user.theme }}"></html>
+<html data-theme="{{ app.user.theme }}">
 {% else %}
-<html data-theme="emerald"></html>
+<html data-theme="emerald">
 {% endif %}
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>{% block title %}Welcome!{% endblock %}</title>
+    <meta name="description" content="{% block meta_description %}QuizDown{% endblock %}">
+    <meta name="keywords" content="{% block meta_keywords %}QuizDown{% endblock %}">
+    <meta name="author" content="{% block meta_author %}QuizDown{% endblock %}">
+    <meta name="robots" content="index, follow">
+    <link rel="icon" href="{{ asset('images/QuizDown.png') }}" type="image/x-icon">
+    <title>{% block title %}QuizDown{% endblock %}</title>
     {% block stylesheets %}
         {{ encore_entry_link_tags('app') }}
     {% endblock %}
     {% block javascripts %}
         {{ encore_entry_script_tags('app') }}
     {% endblock %}
+    {% include 'components/navbar.html.twig' %}
 </head>
 <body>
-{% include 'components/navbar.html.twig' %}
 {% for message in app.flashes('error') %}
     <div class="alert alert-error">
         <span>{{ message }}</span>

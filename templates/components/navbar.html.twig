@@ -8,14 +8,14 @@
                     </label>
                     <ul tabindex="0" class="dropdown-content menu menu-lg p-4 mt-3 z-[1] shadow bg-base-100 rounded-box w-[90vw]">
                         <li class="menu-title font-bold text-lg mb-2">Menu</li>
-                        <li><a class="text-lg py-3"><i class="fas fa-home w-8"></i>Accueil</a></li>
-                        <li><a class="text-lg py-3"><i class="fas fa-question-circle w-8"></i>Quiz</a></li>
-                        <li><a class="text-lg py-3"><i class="fas fa-certificate w-8"></i>Mes certifications</a></li>
+                        <li><a href="{{ path('app_home') }}" class="text-lg py-3"><i class="fas fa-home w-8"></i>Accueil</a></li>
+                        <li><a href="{{ path('app_quiz_index') }}" class="text-lg py-3"><i class="fas fa-question-circle w-8"></i>Quiz</a></li>
+                        <li><a href="#" class="text-lg py-3"><i class="fas fa-certificate w-8"></i>Mes certifications</a></li>
                         {% if is_granted('ROLE_ADMIN') %}
-                            <li><a class="text-lg py-3"><i class="fas fa-cog w-8"></i>Dashboard Admin</a></li>
+                            <li><a href="{{ path('app_admin_dashboard') }}" class="text-lg py-3"><i class="fas fa-cog w-8"></i>Dashboard Admin</a></li>
                         {% endif %}
                         <div class="divider"></div>
-                        <li><a class="text-lg py-3"><i class="fas fa-user-circle w-8"></i>Mon profil</a></li>
+                        <li><a href="{{ path('app_profile') }}" class="text-lg py-3"><i class="fas fa-user-circle w-8"></i>Mon profil</a></li>
                         <li><a href="{{ path('app_logout') }}" class="text-lg py-3"><i class="fas fa-sign-out-alt w-8"></i>Se déconnecter</a></li>
                     </ul>
                 </div>
