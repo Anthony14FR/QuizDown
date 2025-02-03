@@ -36,13 +36,13 @@ class Quiz
     /**
      * @var Collection<int, Category>
      */
-    #[ORM\ManyToMany(targetEntity: Category::class, mappedBy: 'quizzes')]
+    #[ORM\ManyToMany(targetEntity: Category::class, mappedBy: 'quizzes', cascade: ['persist'])]
     private Collection $categories;
 
     /**
      * @var Collection<int, Tag>
      */
-    #[ORM\ManyToMany(targetEntity: Tag::class, mappedBy: 'quizzes')]
+    #[ORM\ManyToMany(targetEntity: Tag::class, mappedBy: 'quizzes', cascade: ['persist'])]
     private Collection $tags;
 
     /**

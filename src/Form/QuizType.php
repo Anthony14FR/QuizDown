@@ -2,7 +2,10 @@
 
 namespace App\Form;
 
+use App\Entity\Category;
+use App\Entity\Tag;
 use App\Entity\Quiz;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
@@ -40,6 +43,28 @@ class QuizType extends AbstractType
                 'mapped' => false,
                 'data' => $options['quiz_type'],
                 'attr' => ['class' => 'form-select']
+            ])
+            ->add('categories', EntityType::class, [
+                'class' => Category::class,
+                'choice_label' => 'name',
+                'multiple' => true,
+                'expanded' => false,
+                'required' => false,
+                'label' => 'Catégories',
+                'attr' => ['class' => 'select select-multiple w-full'],
+                'data' => $options['data']->getCategories(),
+                'by_reference' => false,
+            ])
+            ->add('tags', EntityType::class, [
+                'class' => Tag::class, 
+                'choice_label' => 'name',
+                'multiple' => true,
+                'expanded' => false,
+                'required' => false,
+                'label' => 'Tags',
+                'attr' => ['class' => 'select select-multiple w-full'],
+                'data' => $options['data']->getTags(),
+                'by_reference' => false,
             ])
             ->add('questions', CollectionType::class, [
                 'entry_type' => QuestionType::class,

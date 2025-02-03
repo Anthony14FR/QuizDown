@@ -19,8 +19,12 @@
                             </div>
                             <div class="flex gap-2">
                                 <a href="{{ path('app_quiz_play', {id: quiz.id}) }}" class="btn btn-primary btn-sm">Jouer</a>
-                                <a href="#" class="btn btn-sm">Éditer</a>
-                                <button class="btn btn-error btn-sm">Supprimer</button>
+                                <a href="{{ path('app_admin_quiz_edit', {id: quiz.id}) }}" class="btn btn-sm">Éditer</a>
+                                 <form method="post" action="{{ path('app_admin_quiz_delete', {'id': quiz.id}) }}" class="inline" 
+                                        onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce quiz ?');">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ quiz.id) }}">
+                                    <button type="submit" class="btn btn-error btn-sm">Supprimer</button>
+                                </form>
                             </div>
                         </div>
                     </div>
