@@ -32,6 +32,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 255)]
     private ?string $username = null;
 
+    #[ORM\Column(length: 50)]
+    private ?string $theme = 'emerald';
+
     /**
      * @var Collection<int, Badge>
      */
@@ -118,6 +121,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->username = $username;
 
         return $this;
+    }
+
+    public function getTheme(): ?string
+    {
+        return $this->theme;
+    }
+
+    public function setTheme(?string $theme): void
+    {
+        $this->theme = $theme;
     }
 
     /**
