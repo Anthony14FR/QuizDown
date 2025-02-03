@@ -1,0 +1,155 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <div class="min-h-screen bg-base-200 py-8">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                <div class="lg:col-span-4">
+                    <div class="sticky top-8">
+                        <div class="card bg-base-100 shadow-xl">
+                            <div class="card-body items-center text-center">
+                                <div class="avatar placeholder mb-4">
+                                    <div class="bg-primary text-primary-content rounded-full w-32">
+                                        <span class="text-4xl">{{ app.user.username|slice(0, 2)|upper }}</span>
+                                    </div>
+                                </div>
+                                <h2 class="card-title text-2xl mb-2">{{ app.user.username }}</h2>
+                                <p class="text-base-content/70">{{ app.user.email }}</p>
+                                <div class="divider"></div>
+                                <div class="w-full grid grid-cols-2 gap-4">
+                                    <div class="text-center">
+                                        <div class="stat-value text-primary" style="--value:{{ stats.average_score * 5 }};">{{ stats.average_scores ?? 5 }}/20</div>
+                                        <p class="mt-2 text-sm">Note moyenne</p>
+                                    </div>
+                                    <div class="text-center">
+                                        <div class="stat-value text-primary">{{ stats.total_badges }}</div>
+                                        <p class="text-sm">Badges</p>
+                                     </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card bg-base-100 shadow-xl mt-6">
+                            <div class="card-body">
+                                <h3 class="card-title mb-4">Changer le mot de passe</h3>
+                                <form action="{{ path('app_profile_change_password') }}" method="POST" class="space-y-4">
+                                    <div class="form-control">
+                                        <input type="password" name="current_password" placeholder="Mot de passe actuel" class="input input-bordered w-full" required>
+                                    </div>
+                                    <div class="form-control">
+                                        <input type="password" name="new_password" placeholder="Nouveau mot de passe" class="input input-bordered w-full" required>
+                                    </div>
+                                    <div class="form-control">
+                                        <input type="password" name="repeat_password" placeholder="Répéter le mot de passe" class="input input-bordered w-full" required>
+                                    </div>
+                                    <button class="btn btn-primary w-full">Mettre à jour</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="lg:col-span-8">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+                        <div class="stat bg-base-100 shadow rounded-xl">
+                            <div class="stat-figure text-primary">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                                </svg>
+                            </div>
+                            <div class="stat-title">Quiz créés</div>
+                            <div class="stat-value text-primary">{{ stats.total_quizzes }}</div>
+                        </div>
+
+                        <div class="stat bg-base-100 shadow rounded-xl">
+                            <div class="stat-figure text-secondary">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                                </svg>
+                            </div>
+                            <div class="stat-title">Quiz complétés</div>
+                            <div class="stat-value text-secondary">{{ stats.total_submissions }}</div>
+                        </div>
+
+                        <div class="stat bg-base-100 shadow rounded-xl">
+                            <div class="stat-figure text-accent">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+                                </svg>
+                            </div>
+                            <div class="stat-title">Badges</div>
+                            <div class="stat-value text-accent">{{ stats.total_badges }}</div>
+                        </div>
+
+                        <div class="stat bg-base-100 shadow rounded-xl">
+                            <div class="stat-figure text-info">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
+                                </svg>
+                            </div>
+                            <div class="stat-title">Commentaires</div>
+                            <div class="stat-value text-info">{{ stats.total_comments }}</div>
+                        </div>
+                    </div>
+
+                    <div class="card bg-base-100 shadow-xl">
+                        <div class="card-body">
+                            <h2 class="card-title text-2xl mb-6">Derniers quiz complétés</h2>
+                            <div class="space-y-4">
+                                {% for submission in recent_submissions %}
+                                    <div class="flex items-center p-4 bg-base-200 rounded-xl hover:bg-base-300 transition-colors">
+                                        <div class="flex-1">
+                                            <h3 class="font-bold">{{ submission.quiz.title }}</h3>
+                                            <p class="text-sm text-base-content/70">
+                                                Complété le {{ submission.submittedAt|date('d/m/Y à H:i') }}
+                                            </p>
+                                        </div>
+                                        <div class="flex items-center gap-4">
+                                            <div class="badge badge-lg {{ submission.score >= (submission.quiz.defaultScore * submission.quiz.questions|length / 2) ? 'badge-success' : 'badge-error' }}">
+                                                {{ submission.score }} points
+                                            </div>
+                                            <a href="{{ path('app_quiz_play', {id: submission.quiz.id}) }}" class="btn btn-sm btn-primary">Rejouer</a>
+                                        </div>
+                                    </div>
+                                {% else %}
+                                    <div class="text-center py-8 text-base-content/70">
+                                        <p>Aucun quiz complété pour le moment</p>
+                                        <a href="{{ path('app_quiz_index') }}" class="btn btn-primary mt-4">Découvrir les quiz</a>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card bg-base-100 shadow-xl mt-6">
+                        <div class="card-body">
+                            <h2 class="card-title text-2xl mb-6">Mes derniers quiz créés</h2>
+                            <div class="space-y-4">
+                                {% for quiz in recent_created_quizzes %}
+                                    <div class="flex items-center p-4 bg-base-200 rounded-xl hover:bg-base-300 transition-colors">
+                                        <div class="flex-1">
+                                            <h3 class="font-bold">{{ quiz.title }}</h3>
+                                            <p class="text-sm text-base-content/70">
+                                                Créé le {{ quiz.createdAt|date('d/m/Y à H:i') }}
+                                            </p>
+                                        </div>
+                                        <div class="flex items-center gap-2">
+                                            <span class="badge badge-lg">{{ quiz.questions|length }} questions</span>
+                                            <a href="{{ path('app_quiz_edit', {id: quiz.id}) }}" class="btn btn-sm">Modifier</a>
+                                            <a href="{{ path('app_quiz_play', {id: quiz.id}) }}" class="btn btn-sm btn-primary">Jouer</a>
+                                        </div>
+                                    </div>
+                                {% else %}
+                                    <div class="text-center py-8 text-base-content/70">
+                                        <p>Vous n'avez pas encore créé de quiz</p>
+                                        <a href="{{ path('app_quiz_new') }}" class="btn btn-primary mt-4">Créer un quiz</a>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

@@ -18,6 +18,17 @@
 </head>
 <body>
 {% include 'components/navbar.html.twig' %}
+{% for message in app.flashes('error') %}
+    <div class="alert alert-error">
+        <span>{{ message }}</span>
+    </div>
+{% endfor %}
+
+{% for message in app.flashes('success') %}
+    <div class="alert alert-success">
+        <span>{{ message }}</span>
+    </div>
+{% endfor %}
 {% block body %}{% endblock %}
 </body>
 </html>
