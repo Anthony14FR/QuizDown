@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -15,6 +16,7 @@ class ProfileController extends AbstractController
     #[Route('', name: 'app_profile')]
     public function index(): Response
     {
+        /** @var User $user */
         $user = $this->getUser();
         $submissions = $user->getSubmissions();
 
@@ -48,14 +50,18 @@ class ProfileController extends AbstractController
     }
 
     #[Route('/change-password', name: 'app_profile_change_password', methods: ['POST'])]
-    public function changePassword(Request $request, UserPasswordHasherInterface $passwordHasher, EntityManagerInterface $entityManager): Response
-    {
+    public function changePassword(
+        Request $request,
+        UserPasswordHasherInterface $passwordHasher,
+        EntityManagerInterface $entityManager,
+    ): Response {
+        /** @var User $user */
         $user = $this->getUser();
         $currentPassword = $request->request->get('current_password');
         $newPassword = $request->request->get('new_password');
         $repeatPassword = $request->request->get('repeat_password');
 
-        if (!$passwordHasher->isPasswordValid($user, $currentPassword)) {
+        if (!$currentPassword || !$passwordHasher->isPasswordValid($user, $currentPassword)) {
             $this->addFlash('error', 'Le mot de passe actuel est incorrect.');
 
             return $this->redirectToRoute('app_profile');

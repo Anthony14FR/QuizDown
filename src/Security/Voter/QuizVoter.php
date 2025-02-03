@@ -3,10 +3,14 @@
 namespace App\Security\Voter;
 
 use App\Entity\Quiz;
+use App\Entity\User;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 use Symfony\Component\Security\Core\User\UserInterface;
 
+/**
+ * @extends Voter<string, Quiz>
+ */
 class QuizVoter extends Voter
 {
     public const EDIT = 'QUIZ_EDIT';
@@ -36,7 +40,7 @@ class QuizVoter extends Voter
                 return true;
             case self::EDIT:
             case self::DELETE:
-                return $isAdmin || $user->getId() === $quiz->getCreator()->getId();
+                return $isAdmin || ($user instanceof User && $user->getId() === $quiz->getCreator()->getId());
         }
 
         return false;

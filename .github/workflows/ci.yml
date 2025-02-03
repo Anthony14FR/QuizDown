@@ -40,6 +40,11 @@ jobs:
         with:
           php-version: '8.3'
 
+      - name: Create .env file
+        run: |
+          echo "APP_ENV=test" >> .env
+          echo "APP_SECRET=$(openssl rand -hex 16)" >> .env
+          
       - name: Install dependencies
         run: composer install --no-interaction --no-progress
 
