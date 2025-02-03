@@ -1,0 +1,35 @@
+{% extends 'base.html.twig' %}
+{% block body %}
+    <div class="container mx-auto p-4">
+        <div class="flex justify-between items-center mb-6">
+            <h1 class="text-2xl font-bold">Liste des Catégories</h1>
+            <a href="{{ path('app_admin_category_new') }}" class="btn btn-primary">Créer une catégorie</a>
+        </div>
+        <div class="grid gap-4">
+            {% for category in categories %}
+                <div class="card bg-base-100 shadow-xl">
+                    <div class="card-body">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <h2 class="card-title">{{ category.name }}</h2>
+                                <p class="text-sm opacity-70">{{ category.quizzes|length }} quiz dans cette catégorie</p>
+                            </div>
+                            <div class="flex gap-2">
+                                <a href="{{ path('app_admin_category_edit', {id: category.id}) }}" class="btn btn-sm">Éditer</a>
+                                <form method="post" action="{{ path('app_admin_category_delete', {id: category.id}) }}" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette catégorie ?');" class="inline">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ category.id) }}">
+                                    <button type="submit" class="btn btn-error btn-sm">Supprimer</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% else %}
+                <div class="text-center py-8">
+                    <p class="text-lg">Aucune catégorie créée pour le moment</p>
+                    <a href="{{ path('app_admin_category_new') }}" class="btn btn-primary mt-4">Créer votre première catégorie</a>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}

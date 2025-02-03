@@ -47,22 +47,24 @@ class QuizType extends AbstractType
             ->add('categories', EntityType::class, [
                 'class' => Category::class,
                 'choice_label' => 'name',
-                'label' => 'Catégories',
                 'multiple' => true,
                 'expanded' => false,
-                'by_reference' => false,
-                'attr' => ['class' => 'form-select'],
                 'required' => false,
+                'label' => 'Catégories',
+                'attr' => ['class' => 'select select-multiple w-full'],
+                'data' => $options['data']->getCategories(),
+                'by_reference' => false,
             ])
             ->add('tags', EntityType::class, [
-                'class' => Tag::class,
+                'class' => Tag::class, 
                 'choice_label' => 'name',
-                'label' => 'Tags',
                 'multiple' => true,
                 'expanded' => false,
-                'by_reference' => false,
-                'attr' => ['class' => 'form-select'],
                 'required' => false,
+                'label' => 'Tags',
+                'attr' => ['class' => 'select select-multiple w-full'],
+                'data' => $options['data']->getTags(),
+                'by_reference' => false,
             ])
             ->add('questions', CollectionType::class, [
                 'entry_type' => QuestionType::class,
