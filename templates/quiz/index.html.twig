@@ -8,12 +8,15 @@
             <a href="{{ path('app_quiz_new') }}" class="btn btn-primary">
                 Créer un nouveau quiz
             </a>
+            <a href="{{ path('app_quiz_ai_new') }}" class="btn btn-secondary">
+                Créer un nouveau quiz avec l'IA
+            </a>
         {% endif %}
     </div>
 
     <form method="GET" action="{{ path('app_quiz_index') }}" class="mb-6 grid grid-cols-1 md:grid-cols-3 gap-4">
     <input type="text" name="q" placeholder="Rechercher un quiz..." value="{{ searchTerm }}" class="input input-bordered w-full">
-    
+
     <select name="category" class="select select-bordered w-full">
         <option value="">Toutes les catégories</option>
         {% for cat in categories %}
@@ -43,7 +46,7 @@
                 <div class="card-body">
                     <h2 class="card-title">{{ quiz.title }}</h2>
                     <p class="text-sm text-gray-600">{{ quiz.description|slice(0, 100) }}{% if quiz.description|length > 100 %}...{% endif %}</p>
-                    
+
                     <div class="text-sm text-gray-500 mb-4">
                         <div>Créé par {{ quiz.creator.username }}</div>
                         <div>{{ quiz.questions|length }} question(s)</div>
@@ -59,8 +62,8 @@
                                 <a href="{{ path('app_quiz_edit', {'id': quiz.id}) }}" class="btn btn-ghost btn-sm">
                                     Modifier
                                 </a>
-                                
-                               <form method="post" action="{{ path('app_quiz_delete', {'id': quiz.id}) }}" class="inline" 
+
+                               <form method="post" action="{{ path('app_quiz_delete', {'id': quiz.id}) }}" class="inline"
                                     onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce quiz ?');">
                                     <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ quiz.id) }}">
                                     <button type="submit" class="btn btn-ghost btn-sm text-error">
@@ -82,14 +85,14 @@
     {# PAGINATION #}
     <div class="pagination mt-6 flex justify-center space-x-4">
         {% if page > 1 %}
-            <a href="{{ path('app_quiz_index', { 'page': page - 1, 'limit': limit, 'category': category, 'tag': tag, 'order': order, 'q': searchTerm }) }}" 
+            <a href="{{ path('app_quiz_index', { 'page': page - 1, 'limit': limit, 'category': category, 'tag': tag, 'order': order, 'q': searchTerm }) }}"
             class="btn btn-primary">
                 Précédent
             </a>
         {% endif %}
 
         {% if page < totalPages %}
-            <a href="{{ path('app_quiz_index', { 'page': page + 1, 'limit': limit, 'category': category, 'tag': tag, 'order': order, 'q': searchTerm }) }}" 
+            <a href="{{ path('app_quiz_index', { 'page': page + 1, 'limit': limit, 'category': category, 'tag': tag, 'order': order, 'q': searchTerm }) }}"
             class="btn btn-primary">
                 Suivant
             </a>

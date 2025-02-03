@@ -35,5 +35,7 @@ yarn-error.log
 .phpunit.result.cache
 ###< phpunit/phpunit ###
 
-./compose.yaml
-./compose.override.yaml
+###> docker-compose ###
+/compose.yaml
+/compose.override.yaml
+###< docker-compose ###
