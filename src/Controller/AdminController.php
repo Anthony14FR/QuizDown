@@ -9,6 +9,7 @@ use App\Entity\PenaltyQuiz;
 use App\Entity\Quiz;
 use App\Entity\Tag;
 use App\Entity\TimedQuiz;
+use App\Entity\User;
 use App\Form\BadgeType;
 use App\Form\CategoryType;
 use App\Form\CommentType;
@@ -61,7 +62,7 @@ class AdminController extends AbstractController
                 $quiz->setTimePenalty($quizData['timePenalty'] ?? null);
             }
 
-            $quiz->setCreator($this->getUser());
+            $quiz->setCreator($this->getUser() instanceof User ? $this->getUser() : null);
             $em->persist($quiz);
             $em->flush();
 

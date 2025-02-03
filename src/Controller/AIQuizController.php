@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Answer;
 use App\Entity\Question;
 use App\Entity\Quiz;
+use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -68,7 +69,7 @@ class AIQuizController extends AbstractController
         $quiz->setTitle($quizData['title']);
         $quiz->setDescription($quizData['description']);
         $quiz->setDefaultScore(0);
-        $quiz->setCreator($this->getUser());
+        $quiz->setCreator($this->getUser() instanceof User ? $this->getUser() : null);
 
         foreach ($quizData['questions'] as $questionData) {
             $question = new Question();

@@ -17,7 +17,6 @@ class QuizApiController extends AbstractController
     public function __construct(
         private QuizRepository $quizRepository,
         private SerializerInterface $serializer,
-        private EntityManagerInterface $em,
     ) {
     }
 

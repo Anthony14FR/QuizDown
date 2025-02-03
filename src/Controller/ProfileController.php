@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -15,6 +16,7 @@ class ProfileController extends AbstractController
     #[Route('', name: 'app_profile')]
     public function index(): Response
     {
+        /** @var User $user */
         $user = $this->getUser();
         $submissions = $user->getSubmissions();
 
@@ -48,40 +50,39 @@ class ProfileController extends AbstractController
     }
 
     #[Route('/change-password', name: 'app_profile_change_password', methods: ['POST'])]
-    public function changePassword(Request $request, UserPasswordHasherInterface $passwordHasher, EntityManagerInterface $entityManager): Response
-    {
+    public function changePassword(
+        Request $request,
+        UserPasswordHasherInterface $passwordHasher,
+        EntityManagerInterface $entityManager
+    ): Response {
+        /** @var User $user */
         $user = $this->getUser();
         $currentPassword = $request->request->get('current_password');
         $newPassword = $request->request->get('new_password');
         $repeatPassword = $request->request->get('repeat_password');
 
-        if (!$passwordHasher->isPasswordValid($user, $currentPassword)) {
+        if (!$currentPassword || !$passwordHasher->isPasswordValid($user, $currentPassword)) {
             $this->addFlash('error', 'Le mot de passe actuel est incorrect.');
-
             return $this->redirectToRoute('app_profile');
         }
 
         if (strlen($newPassword) < 8) {
             $this->addFlash('error', 'Le nouveau mot de passe doit contenir au moins 8 caractères.');
-
             return $this->redirectToRoute('app_profile');
         }
 
         if (!preg_match('/[0-9\W]/', $newPassword)) {
             $this->addFlash('error', 'Le nouveau mot de passe doit contenir au moins un chiffre ou un caractère spécial.');
-
             return $this->redirectToRoute('app_profile');
         }
 
         if ($newPassword !== $repeatPassword) {
             $this->addFlash('error', 'Les nouveaux mots de passe ne correspondent pas.');
-
             return $this->redirectToRoute('app_profile');
         }
 
         if ($passwordHasher->isPasswordValid($user, $newPassword)) {
             $this->addFlash('error', 'Le nouveau mot de passe doit être différent de l\'ancien.');
-
             return $this->redirectToRoute('app_profile');
         }
 
@@ -89,7 +90,6 @@ class ProfileController extends AbstractController
         $entityManager->flush();
 
         $this->addFlash('success', 'Mot de passe modifié avec succès.');
-
         return $this->redirectToRoute('app_profile');
     }
 }

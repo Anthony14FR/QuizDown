@@ -7,6 +7,7 @@ use App\Entity\Quiz;
 use App\Entity\Submission;
 use App\Entity\SubmissionAnswer;
 use App\Entity\TimedQuiz;
+use App\Entity\User;
 use App\Form\QuizType;
 use App\Repository\CategoryRepository;
 use App\Repository\QuizRepository;
@@ -82,7 +83,7 @@ class QuizController extends AbstractController
                 $quiz = new Quiz();
         }
 
-        $quiz->setCreator($this->getUser());
+        $quiz->setCreator($this->getUser() instanceof User ? $this->getUser() : null);
 
         $form = $this->createForm(QuizType::class, $quiz);
         $form->handleRequest($request);
@@ -245,7 +246,7 @@ class QuizController extends AbstractController
 
         $submission = new Submission();
         $submission->setQuiz($quiz);
-        $submission->setPlayer($this->getUser());
+        $submission->setPlayer($this->getUser() instanceof User ? $this->getUser() : null);
         $submission->setSubmittedAt(new \DateTimeImmutable());
 
         foreach ($quiz->getQuestions() as $question) {
