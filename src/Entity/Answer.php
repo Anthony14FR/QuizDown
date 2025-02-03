@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Repository\AnswerRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: AnswerRepository::class)]
 class Answer
@@ -11,12 +12,15 @@ class Answer
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['quiz:read:full'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['quiz:read:full'])]
     private ?string $content = null;
 
     #[ORM\Column]
+    #[Groups(['quiz:read:full'])]
     private ?bool $isCorrect = null;
 
     #[ORM\ManyToOne(inversedBy: 'answers')]

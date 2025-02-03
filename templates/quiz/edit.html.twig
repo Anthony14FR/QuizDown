@@ -1,0 +1,214 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Modifier le quiz{% endblock %}
+
+{% block body %}
+    <div class="container mx-auto p-4 max-w-4xl">
+        <h1 class="text-xl font-bold mb-4">Modifier le Quiz</h1>
+
+        {{ form_start(form) }}
+        <div class="card bg-base-100 shadow p-6 mb-6">
+            {{ form_row(form.title, {'attr': {'class': 'input input-bordered w-full'}}) }}
+            {{ form_row(form.type, {'attr': {'class': 'select select-bordered w-full'}}) }}
+                        <div id="timed-fields" style="display: {{ quiz.getType() == 'timed' ? 'block' : 'none' }};">
+                {{ form_row(form.timeLimit, {'attr': {'class': 'input input-bordered w-full'}}) }}
+            </div>
+
+            <div id="penalty-fields" style="display: {{ quiz.getType() == 'penalty' ? 'block' : 'none' }};">
+                {{ form_row(form.penaltyPoints, {'attr': {'class': 'input input-bordered w-full'}}) }}
+                {{ form_row(form.timePenalty, {'attr': {'class': 'input input-bordered w-full'}}) }}
+            </div>
+            {{ form_row(form.defaultScore, {'attr': {'class': 'input input-bordered w-full'}}) }}
+            {{ form_row(form.description, {'attr': {'class': 'textarea textarea-bordered w-full'}}) }}
+        </div>
+
+        <div class="questions-wrapper mt-4">
+            <h3 class="text-xl font-bold mb-4">Questions</h3>
+            <div class="questions-collection" 
+                 data-index="{{ form.questions|length > 0 ? form.questions|length : 0 }}">
+                {% for questionForm in form.questions %}
+                    <div class="question-item card bg-base-200 p-6 mb-4" data-index="{{ loop.index0 }}">
+                        {{ form_row(questionForm.content, {'attr': {'class': 'input input-bordered w-full mb-4'}}) }}
+                        {{ form_row(questionForm.type, {'attr': {'class': 'select select-bordered w-full mb-4'}}) }}
+                        
+                        <div class="answers-collection" data-index="{{ questionForm.answers|length }}">
+                            <h5 class="font-bold mb-2">Réponses</h5>
+                            {% for answerForm in questionForm.answers %}
+                                <div class="answer-item bg-base-100 p-3 rounded-lg mb-2" data-index="{{ loop.index0 }}">
+                                    {{ form_row(answerForm.content, {'attr': {'class': 'input input-bordered w-full mb-2'}}) }}
+                                    <div class="flex items-center gap-2">
+                                        {{ form_widget(answerForm.isCorrect, {'attr': {'class': 'checkbox'}}) }}
+                                        {{ form_label(answerForm.isCorrect, 'Bonne réponse', {'label_attr': {'class': 'cursor-pointer'}}) }}
+                                    </div>
+                                    <button type="button" class="btn btn-error btn-sm remove-answer">Supprimer</button>
+                                </div>
+                            {% endfor %}
+                        </div>
+
+                        <button type="button" class="btn btn-sm btn-secondary mt-2 add-answer">
+                            Ajouter une réponse
+                        </button>
+                        <button type="button" class="btn btn-error btn-sm mt-4 remove-question">
+                            Supprimer la question
+                        </button>
+                    </div>
+                {% endfor %}
+            </div>
+
+            <button type="button" class="btn btn-primary mt-4 add-question">
+                Ajouter une question
+            </button>
+        </div>
+
+        <button type="submit" class="btn btn-success mt-6">Sauvegarder</button>
+        {{ form_end(form) }}
+
+        <template id="question-template">
+            <div class="question-item card bg-base-200 p-6 mb-4">
+                <input type="text" name="quiz[questions][__name__][content]" required 
+                       class="input input-bordered w-full mb-4" placeholder="Votre question">
+                <select name="quiz[questions][__name__][type]" class="select select-bordered w-full mb-4">
+                    <option value="single_choice">Choix unique</option>
+                    <option value="multiple_choice">Choix multiple</option>
+                    <option value="free_text">Réponse libre</option>
+                </select>
+                <input type="number" name="quiz[questions][__name__][difficulty]" 
+                       class="input input-bordered w-full mb-4" value="1" min="1" max="5">
+
+                <div class="answers-collection mt-3" data-index="0">
+                    <h5 class="font-bold mb-2">Réponses</h5>
+                </div>
+
+                <button type="button" class="btn btn-sm btn-secondary mt-2 add-answer">
+                    Ajouter une réponse
+                </button>
+                <button type="button" class="btn btn-error btn-sm mt-4 remove-question">
+                    Supprimer la question
+                </button>
+            </div>
+        </template>
+
+        <template id="answer-template">
+            <div class="answer-item bg-base-100 p-3 rounded-lg mb-2">
+                <input type="text" name="quiz[questions][__question_name__][answers][__name__][content]" 
+                    required class="input input-bordered w-full mb-2" placeholder="Votre réponse">
+                <div class="flex items-center gap-2">
+                    <div class="form-control">
+                        <input type="radio"
+                            id="quiz_questions___question_name___answers___name___isCorrect"
+                            name="quiz[questions][__question_name__][answers][__name__][isCorrect]"
+                            class="checkbox"
+                            value="1">
+                        <label class="cursor-pointer" for="quiz_questions___question_name___answers___name___isCorrect">
+                            Bonne réponse
+                        </label>
+                    </div>
+                </div>
+                <button type="button" class="btn btn-error btn-sm mt-2 remove-answer">Supprimer</button>
+            </div>
+        </template>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const questionsCollection = document.querySelector('.questions-collection');
+            const questionTemplate = document.querySelector('#question-template');
+            const answerTemplate = document.querySelector('#answer-template');
+
+            const typeSelect = document.querySelector('select[name="quiz[type]"]');
+            const timedFields = document.getElementById('timed-fields');
+            const penaltyFields = document.getElementById('penalty-fields');
+
+            function updateFields() {
+                const quizType = typeSelect.value;
+                timedFields.style.display = (quizType === 'timed') ? 'block' : 'none';
+                penaltyFields.style.display = (quizType === 'penalty') ? 'block' : 'none';
+            }
+
+            typeSelect.addEventListener('change', updateFields);
+            updateFields();
+
+            document.querySelectorAll('.remove-answer').forEach(button => {
+                button.addEventListener('click', function () {
+                    this.closest('.answer-item').remove();
+                });
+            });
+
+
+            document.querySelector('.add-question').addEventListener('click', function() {
+                addQuestion();
+            });
+
+            function addQuestion() {
+                const questionIndex = parseInt(questionsCollection.dataset.index);
+                const newQuestion = questionTemplate.content.cloneNode(true);
+
+                newQuestion.querySelectorAll('[name*="__name__"]').forEach(input => {
+                    input.name = input.name.replace('__name__', questionIndex);
+                });
+
+                const questionBlock = newQuestion.querySelector('.question-item');
+                questionBlock.dataset.index = questionIndex;
+                questionsCollection.appendChild(newQuestion);
+                questionsCollection.dataset.index = questionIndex + 1;
+
+                questionBlock.querySelector('.add-answer').addEventListener('click', function() {
+                    addAnswer(questionBlock.querySelector('.answers-collection'), questionIndex);
+                });
+
+                questionBlock.querySelector('.remove-question').addEventListener('click', function() {
+                    questionBlock.remove();
+                });
+
+                addAnswer(questionBlock.querySelector('.answers-collection'), questionIndex);
+            }
+
+            function addAnswer(answersCollection, questionIndex) {
+                const answerIndex = parseInt(answersCollection.dataset.index);
+                const newAnswer = answerTemplate.content.cloneNode(true);
+
+                newAnswer.querySelectorAll('[name*="__question_name__"]').forEach(input => {
+                    input.name = input.name.replace('__question_name__', questionIndex).replace('__name__', answerIndex);
+                });
+
+                const answerBlock = newAnswer.querySelector('.answer-item');
+                answerBlock.querySelector('.remove-answer').addEventListener('click', function() {
+                    answerBlock.remove();
+                });
+
+                const newRadio = answerBlock.querySelector('input[type="radio"]');
+                newRadio.wasChecked = false;
+                newRadio.addEventListener('click', function() {
+                    if (this.checked && this.wasChecked) {
+                        this.checked = false;
+                    }
+                    this.wasChecked = this.checked;
+                });
+
+                answersCollection.appendChild(newAnswer);
+                answersCollection.dataset.index = answerIndex + 1;
+            }
+
+            document.querySelectorAll('.question-item').forEach(question => {
+                question.querySelector('.add-answer').addEventListener('click', function() {
+                    addAnswer(question.querySelector('.answers-collection'), question.dataset.index);
+                });
+
+                question.querySelector('.remove-question').addEventListener('click', function() {
+                    question.remove();
+                });
+            });
+
+            document.querySelectorAll('.answer-item input[type="radio"]').forEach(radio => {
+                radio.addEventListener('click', function() {
+                    if (this.checked && this.wasChecked) {
+                        this.checked = false;
+                    }
+                    this.wasChecked = this.checked;
+                });
+            });
+        });
+    </script>
+{% endblock %}

@@ -1,0 +1,59 @@
+{% extends 'base.html.twig' %}
+{% block title %}Liste des Quiz{% endblock %}
+{% block body %}
+<div class="container mx-auto px-4">
+    <div class="flex justify-between items-center mb-6">
+        <h1 class="text-3xl font-bold">Nos Quiz</h1>
+        {% if is_granted('ROLE_USER') %}
+            <a href="{{ path('app_quiz_new') }}" class="btn btn-primary">
+                Créer un nouveau quiz
+            </a>
+        {% endif %}
+    </div>
+
+    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {% for quiz in quizzes %}
+            <div class="card bg-base-100 shadow-xl">
+                <div class="card-body">
+                    <h2 class="card-title">{{ quiz.title }}</h2>
+                    <p class="text-sm text-gray-600">{{ quiz.description|slice(0, 100) }}{% if quiz.description|length > 100 %}...{% endif %}</p>
+                    
+                    <div class="text-sm text-gray-500 mb-4">
+                        <div>Créé par {{ quiz.creator.username }}</div>
+                        <div>{{ quiz.questions|length }} question(s)</div>
+                    </div>
+
+                    <div class="card-actions justify-between items-center">
+                        <a href="{{ path('app_quiz_play', {'id': quiz.getId()}) }}" class="btn btn-primary btn-sm">
+                            Commencer le quiz
+                        </a>
+
+                        {% if is_granted(constant('App\\Security\\Voter\\QuizVoter::EDIT'), quiz) %}
+                            <div class="flex items-center space-x-2">
+                                <a href="{{ path('app_quiz_edit', {'id': quiz.id}) }}" class="btn btn-ghost btn-sm">
+                                    Modifier
+                                </a>
+                                
+                               <form method="post" action="{{ path('app_quiz_delete', {'id': quiz.id}) }}" class="inline" 
+                                    onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce quiz ?');">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ quiz.id) }}">
+                                    <button type="submit" class="btn btn-ghost btn-sm text-error">
+                                        Supprimer
+                                    </button>
+                                </form>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        {% else %}
+            <div class="col-span-full text-center text-gray-500">
+                <p>Aucun quiz n'est disponible pour le moment.</p>
+                {% if is_granted('ROLE_USER') %}
+                    <a href="{{ path('app_quiz_new') }}" class="btn btn-primary mt-4">Créez votre premier quiz</a>
+                {% endif %}
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

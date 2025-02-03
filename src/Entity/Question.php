@@ -6,34 +6,39 @@ use App\Repository\QuestionRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: QuestionRepository::class)]
 class Question
 {
+    public const TYPE_TRUE_FALSE = 'true_false';
+    public const TYPE_SINGLE_CHOICE = 'single_choice';
+    public const TYPE_MULTIPLE_CHOICE = 'multiple_choice';
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['quiz:read:full'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['quiz:read:full'])]
     private ?string $content = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['quiz:read:full'])]
     private ?string $type = null;
-
-    #[ORM\Column(nullable: true)]
-    private ?int $difficulty = null;
 
     /**
      * @var Collection<int, SubmissionAnswer>
      */
-    #[ORM\OneToMany(targetEntity: SubmissionAnswer::class, mappedBy: 'question')]
+    #[ORM\OneToMany(targetEntity: SubmissionAnswer::class, mappedBy: 'question', cascade: ['remove'])]
     private Collection $submissionAnswers;
 
     /**
      * @var Collection<int, Answer>
      */
-    #[ORM\OneToMany(targetEntity: Answer::class, mappedBy: 'question')]
+    #[ORM\OneToMany(targetEntity: Answer::class, mappedBy: 'question', cascade: ['persist', 'remove'])]
+    #[Groups(['quiz:read:full'])]
     private Collection $answers;
 
     #[ORM\ManyToOne(inversedBy: 'questions')]
@@ -68,21 +73,9 @@ class Question
         return $this->type;
     }
 
-    public function setType(string $type): static
+    public function setType(?string $type): static
     {
-        $this->type = $type;
-
-        return $this;
-    }
-
-    public function getDifficulty(): ?int
-    {
-        return $this->difficulty;
-    }
-
-    public function setDifficulty(?int $difficulty): static
-    {
-        $this->difficulty = $difficulty;
+        $this->type = $type ?? self::TYPE_SINGLE_CHOICE;
 
         return $this;
     }
@@ -157,5 +150,10 @@ class Question
         $this->quiz = $quiz;
 
         return $this;
+    }
+
+    public function isMultipleChoice(): bool
+    {
+        return $this->type === self::TYPE_MULTIPLE_CHOICE;
     }
 }

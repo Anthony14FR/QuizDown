@@ -1,0 +1,36 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <div class="container mx-auto p-4">
+        <div class="flex justify-between items-center mb-6">
+            <h1 class="text-2xl font-bold">Liste des Quiz</h1>
+            <a href="{{ path('app_admin_quiz_new') }}" class="btn btn-primary">Créer un quiz</a>
+        </div>
+
+        <div class="grid gap-4">
+            {% for quiz in quizzes %}
+                <div class="card bg-base-100 shadow-xl">
+                    <div class="card-body">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <h2 class="card-title">{{ quiz.title }}</h2>
+                                <p class="text-sm opacity-70">{{ quiz.questions|length }} questions</p>
+                                <p class="mt-2">{{ quiz.description }}</p>
+                            </div>
+                            <div class="flex gap-2">
+                                <a href="{{ path('app_quiz_play', {id: quiz.id}) }}" class="btn btn-primary btn-sm">Jouer</a>
+                                <a href="#" class="btn btn-sm">Éditer</a>
+                                <button class="btn btn-error btn-sm">Supprimer</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% else %}
+                <div class="text-center py-8">
+                    <p class="text-lg">Aucun quiz créé pour le moment</p>
+                    <a href="{{ path('app_admin_quiz_new') }}" class="btn btn-primary mt-4">Créer votre premier quiz</a>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}
