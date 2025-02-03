@@ -1,41 +1,54 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Log in!{% endblock %}
-
 {% block body %}
-    <form method="post">
-        {% if error %}
-            <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
-        {% endif %}
-
-        {% if app.user %}
-            <div class="mb-3">
-                You are logged in as {{ app.user.userIdentifier }}, <a href="{{ path('app_logout') }}">Logout</a>
+    <div class="min-h-screen bg-base-200 py-16 px-4">
+        <div class="max-w-md mx-auto">
+            <div class="text-center mb-8">
+                <h1 class="text-4xl font-bold text-base-content">QuizDown</h1>
+                <p class="mt-2 text-base-content/70">Connectez-vous à votre compte</p>
             </div>
-        {% endif %}
 
-        <h1 class="h3 mb-3 font-weight-normal">Please sign in</h1>
-        <label for="username">Email</label>
-        <input type="email" value="{{ last_username }}" name="_username" id="username" class="form-control" autocomplete="email" required autofocus>
-        <label for="password">Password</label>
-        <input type="password" name="_password" id="password" class="form-control" autocomplete="current-password" required>
+            {% if error %}
+                <div class="alert alert-error mb-6">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                    <span>{{ error.messageKey|trans(error.messageData, 'security') }}</span>
+                </div>
+            {% endif %}
 
-        <input type="hidden" name="_csrf_token"
-               value="{{ csrf_token('authenticate') }}"
-        >
+            <div class="card bg-base-100 shadow-xl">
+                <div class="card-body space-y-6">
+                    <form method="post" class="space-y-4">
+                        <div class="form-control">
+                            <label for="username" class="label text-sm font-medium">Email</label>
+                            <input type="email" id="username" name="_username" value="{{ last_username }}" class="input input-bordered" required autofocus>
+                        </div>
 
-        {#
-            Uncomment this section and add a remember_me option below your firewall to activate remember me functionality.
-            See https://symfony.com/doc/current/security/remember_me.html
+                        <div class="form-control">
+                            <label for="password" class="label text-sm font-medium">Mot de passe</label>
+                            <input type="password" id="password" name="_password" class="input input-bordered" required>
+                        </div>
 
-            <div class="checkbox mb-3">
-                <input type="checkbox" name="_remember_me" id="_remember_me">
-                <label for="_remember_me">Remember me</label>
+                        <div class="flex items-center justify-between mt-4">
+                            <label class="label cursor-pointer gap-3">
+                                <input type="checkbox" name="_remember_me" class="checkbox checkbox-primary">
+                                <span class="label-text">Se souvenir de moi</span>
+                            </label>
+                            <a href="{{ path('app_forgot_password_request') }}" class="text-sm link link-primary">Mot de passe oublié ?</a>
+                        </div>
+
+                        <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+
+                        <button class="btn btn-primary w-full">Se connecter</button>
+                    </form>
+
+                    <div class="divider">ou</div>
+
+                    <div class="text-center text-sm">
+                        Pas encore de compte ?
+                        <a href="{{ path('app_register') }}" class="link link-primary ml-1">S'inscrire</a>
+                    </div>
+                </div>
             </div>
-        #}
-
-        <button class="btn btn-lg btn-primary" type="submit">
-            Sign in
-        </button>
-    </form>
+        </div>
+    </div>
 {% endblock %}

@@ -1,24 +1,88 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Register{% endblock %}
-
 {% block body %}
-    {% for flash_error in app.flashes('verify_email_error') %}
-        <div class="alert alert-danger" role="alert">{{ flash_error }}</div>
-    {% endfor %}
+    <div class="min-h-screen bg-base-200 py-16 px-4">
+        <div class="max-w-md mx-auto">
+            <div class="text-center mb-8">
+                <h1 class="text-4xl font-bold text-base-content">QuizDown</h1>
+                <p class="mt-2 text-base-content/70">Créez votre compte et commencez à jouer</p>
+            </div>
 
-    <h1>Register</h1>
+            {% for flash_error in app.flashes('verify_email_error') %}
+                <div class="alert alert-error mb-6">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                    <span>{{ flash_error }}</span>
+                </div>
+            {% endfor %}
 
-    {{ form_errors(registrationForm) }}
+            <div class="card bg-base-100 shadow-xl">
+                <div class="card-body space-y-6">
+                    {{ form_start(registrationForm) }}
+                    <div class="space-y-4">
+                        <div class="form-control">
+                            {{ form_label(registrationForm.username, 'Nom d\'utilisateur', {'label_attr': {'class': 'label text-sm font-medium'}}) }}
+                            {{ form_widget(registrationForm.username, {'attr': {'class': 'input input-bordered w-full' ~ (form_errors(registrationForm.username) ? ' input-error' : '')}}) }}
+                            {% if form_errors(registrationForm.username) %}
+                                <div class="text-error text-sm mt-1">
+                                    {{ form_errors(registrationForm.username) }}
+                                </div>
+                            {% endif %}
+                        </div>
 
-    {{ form_start(registrationForm) }}
-        {{ form_row(registrationForm.username) }}
-        {{ form_row(registrationForm.email) }}
-        {{ form_row(registrationForm.plainPassword, {
-            label: 'Password'
-        }) }}
-        {{ form_row(registrationForm.agreeTerms) }}
+                        <div class="form-control">
+                            {{ form_label(registrationForm.email, 'Email', {'label_attr': {'class': 'label text-sm font-medium'}}) }}
+                            {{ form_widget(registrationForm.email, {'attr': {'class': 'input input-bordered w-full' ~ (form_errors(registrationForm.email) ? ' input-error' : '')}}) }}
+                            {% if form_errors(registrationForm.email) %}
+                                <div class="text-error text-sm mt-1">
+                                    {{ form_errors(registrationForm.email) }}
+                                </div>
+                            {% endif %}
+                        </div>
 
-        <button type="submit" class="btn">Register</button>
-    {{ form_end(registrationForm) }}
+                        <div class="form-control">
+                            {{ form_label(registrationForm.plainPassword.first, 'Mot de passe', {'label_attr': {'class': 'label text-sm font-medium'}}) }}
+                            {{ form_widget(registrationForm.plainPassword.first, {'attr': {'class': 'input input-bordered w-full' ~ (form_errors(registrationForm.plainPassword.first) ? ' input-error' : '')}}) }}
+                            {% if form_errors(registrationForm.plainPassword.first) %}
+                                <div class="text-error text-sm mt-1">
+                                    {{ form_errors(registrationForm.plainPassword.first) }}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="form-control">
+                            {{ form_label(registrationForm.plainPassword.second, 'Confirmer le mot de passe', {'label_attr': {'class': 'label text-sm font-medium'}}) }}
+                            {{ form_widget(registrationForm.plainPassword.second, {'attr': {'class': 'input input-bordered w-full' ~ (form_errors(registrationForm.plainPassword.second) ? ' input-error' : '')}}) }}
+                            {% if form_errors(registrationForm.plainPassword.second) %}
+                                <div class="text-error text-sm mt-1">
+                                    {{ form_errors(registrationForm.plainPassword.second) }}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="form-control">
+                            <label class="label justify-start gap-3 cursor-pointer">
+                                {{ form_widget(registrationForm.agreeTerms, {'attr': {'class': 'checkbox checkbox-primary' ~ (form_errors(registrationForm.agreeTerms) ? ' checkbox-error' : '')}}) }}
+                                <span class="label-text">J'accepte les conditions d'utilisation</span>
+                            </label>
+                            {% if form_errors(registrationForm.agreeTerms) %}
+                                <div class="text-error text-sm mt-1">
+                                    {{ form_errors(registrationForm.agreeTerms) }}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-full">Créer mon compte</button>
+                    {{ form_end(registrationForm) }}
+
+                    <div class="divider">ou</div>
+
+                    <div class="text-center text-sm">
+                        Déjà inscrit ?
+                        <a href="{{ path('app_login') }}" class="link link-primary ml-1">Se connecter</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 {% endblock %}
