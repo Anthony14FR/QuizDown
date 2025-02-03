@@ -11,8 +11,8 @@ class SubmissionAnswer
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[ORM\Column]
-    private ?int $id = null;
+    #[ORM\Column(type: Types::INTEGER)]
+    private int $id = 0;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $userAnswer = null;
