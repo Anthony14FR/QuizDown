@@ -6,6 +6,7 @@ use App\Repository\QuestionRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: QuestionRepository::class)]
 class Question
@@ -16,27 +17,28 @@ class Question
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['quiz:read:full'])]
     private ?int $id = null;
 
-    #[ORM\Column(length: 255, nullable: true)]
+    #[ORM\Column(length: 255)]
+    #[Groups(['quiz:read:full'])]
     private ?string $content = null;
 
-    #[ORM\Column(length: 255, nullable: true, options: ['default' => 'single'])]
-    private ?string $type = 'single';
-
-    #[ORM\Column(nullable: true)]
-    private ?int $difficulty = null;
+    #[ORM\Column(length: 255)]
+    #[Groups(['quiz:read:full'])]
+    private ?string $type = null;
 
     /**
      * @var Collection<int, SubmissionAnswer>
      */
-    #[ORM\OneToMany(targetEntity: SubmissionAnswer::class, mappedBy: 'question')]
+    #[ORM\OneToMany(targetEntity: SubmissionAnswer::class, mappedBy: 'question', cascade: ['remove'])]
     private Collection $submissionAnswers;
 
     /**
      * @var Collection<int, Answer>
      */
-    #[ORM\OneToMany(targetEntity: Answer::class, mappedBy: 'question', cascade: ['persist'])]
+    #[ORM\OneToMany(targetEntity: Answer::class, mappedBy: 'question', cascade: ['persist', 'remove'])]
+    #[Groups(['quiz:read:full'])]
     private Collection $answers;
 
     #[ORM\ManyToOne(inversedBy: 'questions')]
@@ -74,18 +76,6 @@ class Question
     public function setType(?string $type): static
     {
         $this->type = $type ?? self::TYPE_SINGLE_CHOICE;
-
-        return $this;
-    }
-
-    public function getDifficulty(): ?int
-    {
-        return $this->difficulty;
-    }
-
-    public function setDifficulty(?int $difficulty): static
-    {
-        $this->difficulty = $difficulty;
 
         return $this;
     }

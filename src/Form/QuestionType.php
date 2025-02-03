@@ -31,20 +31,13 @@ class QuestionType extends AbstractType
                 'label' => 'Question',
                 'attr' => ['class' => 'question-content']
             ])
-            ->add('difficulty', NumberType::class, [
-                'data' => 1,
-                'attr' => [
-                    'min' => 1,
-                    'max' => 5,
-                    'class' => 'question-difficulty'
-                ]
-            ])
             ->add('answers', CollectionType::class, [
                 'entry_type' => AnswerType::class,
                 'allow_add' => true,
                 'allow_delete' => true,
                 'by_reference' => false,
-                'attr' => ['class' => 'answers-collection']
+                'attr' => ['class' => 'answers-collection'],
+                'delete_empty' => true
             ])
         ;
     }

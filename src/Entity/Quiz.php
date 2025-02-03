@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: QuizRepository::class)]
 #[ORM\InheritanceType('JOINED')]
@@ -17,15 +18,19 @@ class Quiz
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    private ?int $id = null;
+    #[Groups(['quiz:read:full'])]
+    protected ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['quiz:read:full'])]
     private ?string $title = null;
 
     #[ORM\Column(type: Types::TEXT)]
+    #[Groups(['quiz:read:full'])]
     private ?string $description = null;
 
     #[ORM\Column]
+    #[Groups(['quiz:read'])]
     private ?int $defaultScore = null;
 
     /**
@@ -43,23 +48,25 @@ class Quiz
     /**
      * @var Collection<int, Submission>
      */
-    #[ORM\OneToMany(targetEntity: Submission::class, mappedBy: 'quiz')]
+    #[ORM\OneToMany(targetEntity: Submission::class, mappedBy: 'quiz', cascade: ['remove'])]
     private Collection $submissions;
 
     /**
      * @var Collection<int, Question>
      */
-    #[ORM\OneToMany(targetEntity: Question::class, mappedBy: 'quiz', cascade: ['persist'])]
+    #[ORM\OneToMany(targetEntity: Question::class, mappedBy: 'quiz', cascade: ['persist', 'remove'])]
+    #[Groups(['quiz:read:full'])]
     private Collection $questions;
 
     #[ORM\ManyToOne(inversedBy: 'quizzes')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['quiz:read'])]
     private ?User $creator = null;
 
     /**
      * @var Collection<int, Comment>
      */
-    #[ORM\OneToMany(targetEntity: Comment::class, mappedBy: 'quiz')]
+    #[ORM\OneToMany(targetEntity: Comment::class, mappedBy: 'quiz', cascade: ['remove'])]
     private Collection $comments;
 
     public function __construct()
@@ -267,4 +274,13 @@ class Quiz
 
         return $this;
     }
+
+    public function getType(): string
+{
+    return match (true) {
+        $this instanceof TimedQuiz => 'timed',
+        $this instanceof PenaltyQuiz => 'penalty',
+        default => 'base',
+    };
+}
 }
