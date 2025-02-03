@@ -60,7 +60,7 @@ class AdminController extends AbstractController
 
             $quiz->setCreator($this->getUser() instanceof User ? $this->getUser() : null);
             $em->persist($quiz);
-            $em->flush();
+            $em->flush( );
 
             $this->addFlash('success', 'Quiz créé avec succès');
 
