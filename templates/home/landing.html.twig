@@ -1,0 +1,111 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <div class="hero bg-base-200 h-[70vh]">
+        <div class="hero-content text-center">
+            <div class="max-w-xl px-4">
+                <h1 class="text-4xl lg:text-5xl font-bold mb-4">QuizDown</h1>
+                <p class="text-lg lg:text-xl mb-8">La plateforme interactive pour créer, partager et tester vos connaissances</p>
+                <div class="flex flex-col sm:flex-row justify-center gap-4">
+                    <a href="{{ path('app_login') }}" class="btn btn-primary w-full sm:w-auto"><i class="fas fa-sign-in-alt mr-2"></i>Se connecter</a>
+                    <a href="{{ path('app_register') }}" class="btn btn-secondary w-full sm:w-auto"><i class="fas fa-user-plus mr-2"></i>S'inscrire</a>
+                </div>
+                <div class="mt-8 animate-bounce">
+                    <i class="fas fa-chevron-down text-2xl"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <section class="py-16 bg-base-100">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl lg:text-4xl font-bold text-center mb-12">Fonctionnalités</h2>
+            <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div class="card bg-base-200">
+                    <figure class="px-4 pt-4">
+                        <img src="https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=500" alt="Quiz" class="rounded-xl h-48 w-full object-cover" />
+                    </figure>
+                    <div class="card-body items-center text-center">
+                        <h3 class="card-title"><i class="fas fa-pencil-alt mr-2"></i>Création Simple</h3>
+                        <p>Créez des quiz personnalisés en quelques clics</p>
+                    </div>
+                </div>
+                <div class="card bg-base-200">
+                    <figure class="px-4 pt-4">
+                        <img src="https://images.unsplash.com/photo-1521737604893-d14cc237f11d?w=500" alt="Collaboration" class="rounded-xl h-48 w-full object-cover" />
+                    </figure>
+                    <div class="card-body items-center text-center">
+                        <h3 class="card-title"><i class="fas fa-share-alt mr-2"></i>Partage Facile</h3>
+                        <p>Partagez vos quiz avec votre communauté</p>
+                    </div>
+                </div>
+                <div class="card bg-base-200">
+                    <figure class="px-4 pt-4">
+                        <img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=500" alt="Analytics" class="rounded-xl h-48 w-full object-cover" />
+                    </figure>
+                    <div class="card-body items-center text-center">
+                        <h3 class="card-title"><i class="fas fa-chart-line mr-2"></i>Suivi des Progrès</h3>
+                        <p>Analysez vos performances et progressez</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-16 bg-base-200">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl lg:text-4xl font-bold text-center mb-12">Types de Quiz</h2>
+            <div class="flex flex-col lg:flex-row justify-center gap-8">
+                <div class="card w-full lg:w-96 bg-base-100">
+                    <figure class="px-4 pt-4">
+                        <img src="https://images.unsplash.com/photo-1526379879527-8559ecfcaec0?w=500" alt="Timer" class="rounded-xl h-48 w-full object-cover" />                    </figure>
+                    <div class="card-body">
+                        <h3 class="card-title"><i class="fas fa-clock mr-2"></i>Quiz Chronométré</h3>
+                        <p>Testez vos connaissances contre la montre</p>
+                    </div>
+                </div>
+                <div class="card w-full lg:w-96 bg-base-100">
+                    <figure class="px-4 pt-4">
+                        <img src="https://images.unsplash.com/photo-1606326608606-aa0b62935f2b?w=500" alt="Warning" class="rounded-xl h-48 w-full object-cover" />
+                    </figure>
+                    <div class="card-body">
+                        <h3 class="card-title"><i class="fas fa-exclamation-triangle mr-2"></i>Quiz avec Pénalités</h3>
+                        <p>Réfléchissez bien avant de répondre</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-16 bg-base-100">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl lg:text-4xl font-bold text-center mb-12">Certifications</h2>
+            <div class="flex flex-col items-center">
+                <img src="https://images.unsplash.com/photo-1589330694653-ded6df03f754?w=500" alt="Certification" class="rounded-xl max-w-md w-full mb-8" />
+                <p class="text-xl mb-8">Obtenez des certifications reconnues dans votre domaine</p>
+                <div class="stats shadow flex-wrap">
+                    <div class="stat">
+                        <div class="stat-title">Quiz Disponibles</div>
+                        <div class="stat-value">500+</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-title">Utilisateurs</div>
+                        <div class="stat-value">10k+</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-title">Certifications</div>
+                        <div class="stat-value">50+</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-16 bg-base-200">
+        <div class="container mx-auto px-4 text-center">
+            <h2 class="text-3xl lg:text-4xl font-bold mb-8">Prêt à commencer ?</h2>
+            <p class="text-lg lg:text-xl mb-8">Rejoignez notre communauté et développez vos compétences</p>
+            <a href="{{ path('app_register') }}" class="btn btn-primary btn-lg"><i class="fas fa-rocket mr-2"></i>Commencer maintenant</a>
+        </div>
+    </section>
+{% endblock %}
