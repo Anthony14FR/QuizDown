@@ -80,4 +80,23 @@ class QuizRepository extends ServiceEntityRepository
 
         return (int) $qb->getQuery()->getSingleScalarResult();
     }
+
+    public function findMostPlayed(int $limit = 3): array
+    {
+        $results = $this->createQueryBuilder('q')
+            ->select('q, COUNT(s.id) as playCount')
+            ->leftJoin('q.submissions', 's')
+            ->groupBy('q.id')
+            ->orderBy('playCount', 'DESC')
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getResult();
+
+        return array_map(function($result) {
+            return [
+                'quiz' => $result[0],
+                'playCount' => $result['playCount']
+            ];
+        }, $results);
+    }
 }
