@@ -23,17 +23,36 @@
     {% include 'components/navbar.html.twig' %}
 </head>
 <body>
-{% for message in app.flashes('error') %}
-    <div class="alert alert-error">
-        <span>{{ message }}</span>
-    </div>
-{% endfor %}
+<div class="flex-1">
+    {% for message in app.flashes('error') %}
+        <div class="mx-4 my-4">
+            <div class="alert alert-error" id="flash-{{ loop.index }}">
+                <span>{{ message }}</span>
+            </div>
+        </div>
+    {% endfor %}
 
-{% for message in app.flashes('success') %}
-    <div class="alert alert-success">
-        <span>{{ message }}</span>
-    </div>
-{% endfor %}
+    {% for message in app.flashes('success') %}
+        <div class="mx-4 my-4">
+            <div class="alert alert-success" id="flash-success-{{ loop.index }}">
+                <span>{{ message }}</span>
+            </div>
+        </div>
+    {% endfor %}
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const alerts = document.querySelectorAll('.alert');
+        alerts.forEach(alert => {
+            setTimeout(() => {
+                alert.style.transition = 'opacity 0.5s ease-out';
+                alert.style.opacity = '0';
+                setTimeout(() => alert.remove(), 500);
+            }, 4000);
+        });
+    });
+</script>
 {% block body %}{% endblock %}
 </body>
 </html>
