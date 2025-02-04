@@ -92,10 +92,10 @@ class QuizRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
 
-        return array_map(function($result) {
+        return array_map(function ($result) {
             return [
                 'quiz' => $result[0],
-                'playCount' => $result['playCount']
+                'playCount' => $result['playCount'],
             ];
         }, $results);
     }
