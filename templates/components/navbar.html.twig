@@ -68,7 +68,30 @@
                         <input
                             type="checkbox"
                             value="halloween"
-                            class="toggle theme-controller bg-base-content col-span-2 col-start-1 row-start-1" />
+                            {{ app.user.theme == 'halloween' ? 'checked' : '' }}
+                            class="toggle theme-controller bg-base-content col-span-2 col-start-1 row-start-1"
+                            onchange="updateTheme(this)"/>
+
+                        <script>
+                            document.addEventListener('DOMContentLoaded', () => {
+                                const html = document.querySelector('html');
+                                html.setAttribute('data-theme', '{{ app.user.theme }}');
+                            });
+
+                            function updateTheme(checkbox) {
+                                const theme = checkbox.checked ? 'halloween' : 'emerald';
+                                document.querySelector('html').setAttribute('data-theme', theme);
+
+                                fetch('/api/theme', {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/x-www-form-urlencoded',
+                                        'X-CSRF-Token': '{{ csrf_token('theme') }}'
+                                    },
+                                    body: `theme=${theme}`
+                                });
+                            }
+                        </script>
                         <svg
                             class="stroke-base-100 fill-base-100 col-start-1 row-start-1"
                             xmlns="http://www.w3.org/2000/svg"
