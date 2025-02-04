@@ -104,6 +104,8 @@ class QuizController extends AbstractController
                 $tag->addQuiz($quiz);
             }
 
+            $quiz->defaultScore = $quizData['defaultScore'] > 0 ? $quizData['defaultScore'] : 1;
+
             $entityManager->persist($quiz);
             $entityManager->flush();
 
