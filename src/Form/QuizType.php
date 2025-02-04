@@ -29,7 +29,7 @@ class QuizType extends AbstractType
                 'attr' => ['class' => 'form-control'],
             ])
             ->add('defaultScore', IntegerType::class, [
-                'label' => 'Score par défaut',
+                'label' => 'Point par question',
                 'attr' => ['class' => 'form-control'],
             ])
             ->add('type', ChoiceType::class, [

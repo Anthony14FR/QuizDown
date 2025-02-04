@@ -32,7 +32,7 @@ class Quiz
 
     #[ORM\Column]
     #[Groups(['quiz:read'])]
-    private ?int $defaultScore = null;
+    public ?int $defaultScore = 1;
 
     /**
      * @var Collection<int, Category>

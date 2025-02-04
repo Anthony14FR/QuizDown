@@ -121,6 +121,8 @@ class QuizController extends AbstractController
                 $tag->addQuiz($quiz);
             }
 
+            $quiz->defaultScore = $quizData['defaultScore'] > 0 ? $quizData['defaultScore'] : 1;
+
             $entityManager->persist($quiz);
             $entityManager->flush();
 
@@ -282,9 +284,11 @@ class QuizController extends AbstractController
                         $score += $quiz->getDefaultScore();
                     }
                 } elseif ('multiple_choice' === $question->getType()) {
-                    $userAnswers = is_array($userAnswer) ? $userAnswer : [];
+                    $userAnswers = is_array($userAnswer) ? array_map('intval', $userAnswer) : [];
                     $correctAnswers = $question->getAnswers()->filter(fn ($a) => $a->isCorrect())->map(fn ($a) => $a->getId())->toArray();
-                    if ($userAnswers == $correctAnswers) {
+                    sort($userAnswers);
+                    sort($correctAnswers);
+                    if ($userAnswers === $correctAnswers) {
                         $isCorrect = true;
                         $score += $quiz->getDefaultScore();
                     }
