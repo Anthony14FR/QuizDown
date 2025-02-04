@@ -14,8 +14,11 @@ class SubmissionAnswer
     #[ORM\Column(type: Types::INTEGER)]
     private int $id = 0;
 
-    #[ORM\Column(type: Types::TEXT, nullable: true)]
-    private ?string $userAnswer = null;
+    /**
+     * @var array<int, int>|string|null
+     */
+    #[ORM\Column(type: Types::JSON, nullable: true)]
+    private array|string|null $userAnswer = null;
 
     #[ORM\Column(nullable: true)]
     private ?bool $isCorrect = null;
@@ -31,12 +34,14 @@ class SubmissionAnswer
         return $this->id;
     }
 
-    public function getUserAnswer(): ?string
+    /** @return int[]|string|null */
+    public function getUserAnswer(): array|string|null
     {
         return $this->userAnswer;
     }
 
-    public function setUserAnswer(?string $userAnswer): static
+    /** @param int[]|string|null $userAnswer */
+    public function setUserAnswer(array|string|null $userAnswer): static
     {
         $this->userAnswer = $userAnswer;
 
