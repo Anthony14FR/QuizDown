@@ -214,6 +214,8 @@ class QuizController extends AbstractController
                 }
             }
 
+            $quiz->defaultScore = $quiz->defaultScore > 0 ? $quiz->defaultScore : 1;
+
             $entityManager->flush();
 
             $this->addFlash('success', 'Le quiz a été modifié avec succès.');
