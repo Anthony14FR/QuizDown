@@ -15,11 +15,13 @@ use App\Form\CategoryType;
 use App\Form\CommentType;
 use App\Form\QuizType;
 use App\Form\TagType;
+use App\Form\UserType;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
@@ -433,5 +435,87 @@ class AdminController extends AbstractController
         }
 
         return $this->redirectToRoute('app_admin_comment_list');
+    }
+
+    #[Route('/user', name: 'app_admin_user_list')]
+    public function userList(EntityManagerInterface $em): Response
+    {
+        $users = $em->getRepository(User::class)->findAll();
+
+        return $this->render('admin/user/list.html.twig', [
+            'users' => $users,
+        ]);
+    }
+
+    #[Route('/user/new', name: 'app_admin_user_new')]
+    public function newUser(Request $request, EntityManagerInterface $em, UserPasswordHasherInterface $passwordHasher): Response
+    {
+        $user = new User();
+        $form = $this->createForm(UserType::class, $user);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $hashedPassword = $passwordHasher->hashPassword($user, $user->getPassword());
+            $user->setPassword($hashedPassword);
+
+            $em->persist($user);
+            $em->flush();
+
+            $this->addFlash('success', 'Utilisateur créé avec succès');
+
+            return $this->redirectToRoute('app_admin_user_list');
+        }
+
+        return $this->render('admin/user/form.html.twig', [
+            'form' => $form,
+            'is_edit' => false,
+        ]);
+    }
+
+    #[Route('/user/{id}/edit', name: 'app_admin_user_edit')]
+    public function editUser(User $user, Request $request, EntityManagerInterface $em, UserPasswordHasherInterface $passwordHasher): Response
+    {
+        $form = $this->createForm(UserType::class, $user, ['is_edit' => true]);
+        $originalPassword = $user->getPassword();
+
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            if ($user->getPassword() !== $originalPassword) {
+                $hashedPassword = $passwordHasher->hashPassword($user, $user->getPassword());
+                $user->setPassword($hashedPassword);
+            } else {
+                $user->setPassword($originalPassword);
+            }
+
+            $em->flush();
+            $this->addFlash('success', 'Utilisateur modifié avec succès');
+
+            return $this->redirectToRoute('app_admin_user_list');
+        }
+
+        return $this->render('admin/user/form.html.twig', [
+            'form' => $form,
+            'is_edit' => true,
+            'user' => $user,
+        ]);
+    }
+
+    #[Route('/user/{id}/delete', name: 'app_admin_user_delete', methods: ['POST'])]
+    public function deleteUser(User $user, Request $request, EntityManagerInterface $em): Response
+    {
+        if ($this->isCsrfTokenValid('delete'.$user->getId(), $request->request->get('_token'))) {
+            if ($user === $this->getUser()) {
+                $this->addFlash('error', 'Vous ne pouvez pas supprimer votre propre compte');
+
+                return $this->redirectToRoute('app_admin_user_list');
+            }
+
+            $em->remove($user);
+            $em->flush();
+            $this->addFlash('success', 'Utilisateur supprimé avec succès');
+        }
+
+        return $this->redirectToRoute('app_admin_user_list');
     }
 }
