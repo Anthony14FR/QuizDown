@@ -1,0 +1,48 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <div class="container mx-auto p-4">
+        <div class="flex justify-between items-center mb-6">
+            <h1 class="text-2xl font-bold">Liste des Utilisateurs</h1>
+            <a href="{{ path('app_admin_user_new') }}" class="btn btn-primary">Créer un utilisateur</a>
+        </div>
+        <div class="grid gap-4">
+            {% for user in users %}
+                <div class="card bg-base-100 shadow-xl">
+                    <div class="card-body">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <h2 class="card-title">{{ user.username }}</h2>
+                                <p class="text-sm opacity-70">{{ user.email }}</p>
+                                <div class="mt-2">
+                                    {% for role in user.roles %}
+                                        <span class="badge badge-primary">{{ role }}</span>
+                                    {% endfor %}
+                                    {% if user.isVerified %}
+                                        <span class="badge badge-success">Vérifié</span>
+                                    {% else %}
+                                        <span class="badge badge-error">Non vérifié</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="flex gap-2">
+                                <a href="{{ path('app_admin_user_edit', {id: user.id}) }}" class="btn btn-sm">Éditer</a>
+                                {% if app.user != user %}
+                                    <form method="post" action="{{ path('app_admin_user_delete', {id: user.id}) }}" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cet utilisateur ?');" class="inline">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ user.id) }}">
+                                        <button type="submit" class="btn btn-error btn-sm">Supprimer</button>
+                                    </form>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% else %}
+                <div class="text-center py-8">
+                    <p class="text-lg">Aucun utilisateur enregistré pour le moment</p>
+                    <a href="{{ path('app_admin_user_new') }}" class="btn btn-primary mt-4">Créer un nouvel utilisateur</a>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}
