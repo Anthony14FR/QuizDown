@@ -12,7 +12,7 @@ class Comment
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    private int $id = 0;
+    private int $id;
 
     #[ORM\Column(type: Types::TEXT)]
     private ?string $content = null;

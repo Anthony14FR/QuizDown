@@ -2,12 +2,14 @@
 
 namespace App\Controller;
 
+use App\Entity\Comment;
 use App\Entity\PenaltyQuiz;
 use App\Entity\Quiz;
 use App\Entity\Submission;
 use App\Entity\SubmissionAnswer;
 use App\Entity\TimedQuiz;
 use App\Entity\User;
+use App\Form\CommentType;
 use App\Form\QuizType;
 use App\Repository\CategoryRepository;
 use App\Repository\QuizRepository;
@@ -61,6 +63,21 @@ class QuizController extends AbstractController
             'totalPages' => $totalPages,
             'categories' => $categories,
             'tags' => $tags,
+        ]);
+    }
+
+    #[Route('/detail/{id}', name: 'app_quiz_detail')]
+    public function detail(Quiz $quiz): Response
+    {
+        $comment = new Comment();
+        $commentForm = $this->createForm(CommentType::class, $comment, [
+            'action' => $this->generateUrl('app_quiz_comment', ['id' => $quiz->getId()]),
+        ]);
+
+        return $this->render('quiz/detail.html.twig', [
+            'quiz' => $quiz,
+            'comments' => $quiz->getComments(),
+            'commentForm' => $commentForm,
         ]);
     }
 
@@ -291,5 +308,47 @@ class QuizController extends AbstractController
         return $this->render('quiz/result.html.twig', [
             'submission' => $submission,
         ]);
+    }
+
+    #[Route('/{id}/comment', name: 'app_quiz_comment', methods: ['POST'])]
+    public function addComment(Quiz $quiz, Request $request, EntityManagerInterface $em): Response
+    {
+        $comment = new Comment();
+        $comment->setQuiz($quiz);
+        $comment->setAuthor($this->getUser() instanceof User ? $this->getUser() : null);
+        $comment->setCreatedAt(new \DateTimeImmutable());
+
+        $form = $this->createForm(CommentType::class, $comment);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $em->persist($comment);
+            $em->flush();
+            $this->addFlash('success', 'Commentaire ajouté avec succès');
+
+            return $this->redirectToRoute('app_quiz_detail', ['id' => $quiz->getId()]);
+        }
+
+        return $this->redirectToRoute('app_quiz_detail', ['id' => $quiz->getId()]);
+    }
+
+    #[Route('/{id}/comment/delete', name: 'app_comment_delete', methods: ['POST'])]
+    public function deleteComment(
+        Comment $comment,
+        EntityManagerInterface $entityManager,
+        Request $request,
+    ): Response {
+        if ($this->isCsrfTokenValid('delete'.$comment->getId(), $request->request->get('_token'))) {
+            $quizId = $comment->getQuiz()->getId();
+
+            $entityManager->remove($comment);
+            $entityManager->flush();
+
+            $this->addFlash('success', 'Commentaire supprimé avec succès.');
+
+            return $this->redirectToRoute('app_quiz_detail', ['id' => $quizId]);
+        }
+
+        return $this->redirectToRoute('app_quiz_detail', ['id' => $comment->getQuiz()->getId()]);
     }
 }

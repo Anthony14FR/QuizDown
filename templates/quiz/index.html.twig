@@ -56,6 +56,9 @@
                         <a href="{{ path('app_quiz_play', {'id': quiz.getId()}) }}" class="btn btn-primary btn-sm">
                             Commencer le quiz
                         </a>
+                        <a href="{{ path('app_quiz_detail', {'id': quiz.getId()}) }}" class="btn btn-primary btn-sm">
+                            Détail du quiz
+                        </a>
 
                         {% if is_granted(constant('App\\Security\\Voter\\QuizVoter::EDIT'), quiz) %}
                             <div class="flex items-center space-x-2">
