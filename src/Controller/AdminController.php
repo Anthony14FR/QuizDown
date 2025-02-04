@@ -2,12 +2,16 @@
 
 namespace App\Controller;
 
+use App\Entity\Badge;
 use App\Entity\Category;
+use App\Entity\Comment;
 use App\Entity\PenaltyQuiz;
 use App\Entity\Quiz;
 use App\Entity\Tag;
 use App\Entity\TimedQuiz;
+use App\Form\BadgeType;
 use App\Form\CategoryType;
+use App\Form\CommentType;
 use App\Form\QuizType;
 use App\Form\TagType;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -297,5 +301,136 @@ class AdminController extends AbstractController
         }
 
         return $this->redirectToRoute('app_admin_tag_list');
+    }
+
+    #[Route('/badge', name: 'app_admin_badge_list')]
+    public function badgeList(EntityManagerInterface $em): Response
+    {
+        $badges = $em->getRepository(Badge::class)->findAll();
+
+        return $this->render('admin/badge/list.html.twig', [
+            'badges' => $badges,
+        ]);
+    }
+
+    #[Route('/badge/new', name: 'app_admin_badge_new')]
+    public function newBadge(Request $request, EntityManagerInterface $em): Response
+    {
+        $badge = new Badge();
+
+        $form = $this->createForm(BadgeType::class, $badge);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $em->persist($badge);
+            $em->flush();
+
+            $this->addFlash('success', 'Badge créé avec succès');
+
+            return $this->redirectToRoute('app_admin_badge_list');
+        }
+
+        return $this->render('admin/badge/form.html.twig', [
+            'form' => $form,
+            'is_edit' => false,
+        ]);
+    }
+
+    #[Route('/badge/{id}/edit', name: 'app_admin_badge_edit')]
+    public function editBadge(Badge $badge, Request $request, EntityManagerInterface $em): Response
+    {
+        $form = $this->createForm(BadgeType::class, $badge);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $em->flush();
+            $this->addFlash('success', 'Badge modifié avec succès');
+
+            return $this->redirectToRoute('app_admin_badge_list');
+        }
+
+        return $this->render('admin/badge/form.html.twig', [
+            'form' => $form,
+            'is_edit' => true,
+            'badge' => $badge,
+        ]);
+    }
+
+    #[Route('/badge/{id}/delete', name: 'app_admin_badge_delete', methods: ['POST'])]
+    public function deleteBadge(Badge $badge, Request $request, EntityManagerInterface $em): Response
+    {
+        if ($this->isCsrfTokenValid('delete'.$badge->getId(), $request->request->get('_token'))) {
+            $em->remove($badge);
+            $em->flush();
+            $this->addFlash('success', 'Badge supprimé avec succès');
+        }
+
+        return $this->redirectToRoute('app_admin_badge_list');
+    }
+
+    #[Route('/comment', name: 'app_admin_comment_list')]
+    public function commentList(EntityManagerInterface $em): Response
+    {
+        $comments = $em->getRepository(Comment::class)->findAll();
+
+        return $this->render('admin/comment/list.html.twig', [
+            'comments' => $comments,
+        ]);
+    }
+
+    #[Route('/comment/new', name: 'app_admin_comment_new')]
+    public function newComment(Request $request, EntityManagerInterface $em): Response
+    {
+        $comment = new Comment();
+
+        $form = $this->createForm(CommentType::class, $comment);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $comment->setCreatedAt(new \DateTimeImmutable('now', new \DateTimeZone('Europe/Paris')));
+            $em->persist($comment);
+            $em->flush();
+
+            $this->addFlash('success', 'Commentaire créé avec succès');
+
+            return $this->redirectToRoute('app_admin_comment_list');
+        }
+
+        return $this->render('admin/comment/form.html.twig', [
+            'form' => $form,
+            'is_edit' => false,
+        ]);
+    }
+
+    #[Route('/comment/{id}/edit', name: 'app_admin_comment_edit')]
+    public function editComment(Comment $comment, Request $request, EntityManagerInterface $em): Response
+    {
+        $form = $this->createForm(CommentType::class, $comment);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $em->flush();
+            $this->addFlash('success', 'Commentaire modifié avec succès');
+
+            return $this->redirectToRoute('app_admin_comment_list');
+        }
+
+        return $this->render('admin/comment/form.html.twig', [
+            'form' => $form,
+            'is_edit' => true,
+            'comment' => $comment,
+        ]);
+    }
+
+    #[Route('/comment/{id}/delete', name: 'app_admin_comment_delete', methods: ['POST'])]
+    public function deleteComment(Comment $comment, Request $request, EntityManagerInterface $em): Response
+    {
+        if ($this->isCsrfTokenValid('delete'.$comment->getId(), $request->request->get('_token'))) {
+            $em->remove($comment);
+            $em->flush();
+            $this->addFlash('success', 'Commentaire supprimé avec succès');
+        }
+
+        return $this->redirectToRoute('app_admin_comment_list');
     }
 }

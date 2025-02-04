@@ -1,0 +1,40 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <div class="container mx-auto p-4 max-w-4xl">
+        <h1 class="text-2xl font-bold mb-6">
+            {% if is_edit %}
+                Modifier le commentaire
+            {% else %}
+                Créer un commentaire
+            {% endif %}
+        </h1>
+
+        {{ form_start(form) }}
+            <div class="card bg-base-100 shadow p-6 mb-6">
+                {{ form_row(form.content, {
+                    'attr': {'class': 'textarea textarea-bordered w-full min-h-[200px]'}
+                }) }}
+
+                {{ form_row(form.author, {
+                    'attr': {'class': 'select select-bordered w-full'}
+                }) }}
+
+                {{ form_row(form.quiz, {
+                    'attr': {'class': 'select select-bordered w-full'}
+                }) }}
+            </div>
+
+            <div class="mt-6 flex gap-2">
+                <button type="submit" class="btn btn-success">
+                    {% if is_edit %}
+                        Enregistrer les modifications
+                    {% else %}
+                        Créer le commentaire
+                    {% endif %}
+                </button>
+                <a href="{{ path('app_admin_comment_list') }}" class="btn">Annuler</a>
+            </div>
+        {{ form_end(form) }}
+    </div>
+{% endblock %}
