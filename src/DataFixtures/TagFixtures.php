@@ -15,7 +15,7 @@ class TagFixtures extends Fixture
             'Moyen',
             'Difficile',
             'Expert',
-            'Débutant'
+            'Débutant',
         ];
 
         foreach ($tags as $tagName) {
