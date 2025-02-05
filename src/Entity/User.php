@@ -9,10 +9,12 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: '`user`')]
-#[UniqueEntity(fields: ['username'], message: 'There is already an account with this username')]
+#[UniqueEntity(fields: ['username'], message: 'Ce nom d\'utilisateur existe déjà')]
+#[UniqueEntity(fields: ['email'], message: 'Cet email existe déjà')]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
@@ -21,17 +23,40 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?int $id = 0;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message: 'L\'email est obligatoire')]
+    #[Assert\Email(message: 'L\'email {{ value }} n\'est pas valide')]
     private ?string $email = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message: 'Le nom d\'utilisateur est obligatoire')]
+    #[Assert\Length(
+        min: 3,
+        minMessage: 'Le nom d\'utilisateur doit faire au moins {{ limit }} caractères'
+    )]
+    private ?string $username = null;
+
+    #[ORM\Column(type: 'string', length: 255)]
+    #[Assert\NotBlank(message: 'Le mot de passe est obligatoire', groups: ['creation'])]
+    #[Assert\Length(
+        min: 6,
+        minMessage: 'Le mot de passe doit faire au moins {{ limit }} caractères',
+        groups: ['creation']
+    )]
+    #[Assert\Regex(
+        pattern: '/^(?=.*[A-Za-z])(?=.*\d).+$/',
+        message: 'Le mot de passe doit contenir au moins une lettre et un chiffre',
+        groups: ['creation']
+    )]
     private ?string $password = null;
 
     /** @var array<int, string> */
     #[ORM\Column(type: 'json')]
+    #[Assert\NotBlank(message: 'Le rôle est obligatoire')]
+    #[Assert\Count(
+        min: 1,
+        minMessage: 'L\'utilisateur doit avoir au moins un rôle'
+    )]
     private array $roles = [];
-
-    #[ORM\Column(length: 255)]
-    private ?string $username = null;
 
     #[ORM\Column(length: 20, options: ['default' => 'emerald'])]
     private ?string $theme = 'emerald';

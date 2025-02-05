@@ -27,6 +27,7 @@ class UserType extends AbstractType
                 ],
                 'multiple' => true,
                 'expanded' => true,
+                'required' => true,
             ])
             ->add('password', PasswordType::class, [
                 'required' => !$options['is_edit'],

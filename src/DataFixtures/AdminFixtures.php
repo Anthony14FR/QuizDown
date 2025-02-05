@@ -22,7 +22,7 @@ class AdminFixtures extends Fixture
         $admin->setEmail('admin@orus.com');
         $admin->setUsername('admin');
         $admin->setRoles(['ROLE_ADMIN']);
-        $admin->setPassword($this->hasher->hashPassword($admin, 'admin'));
+        $admin->setPassword($this->hasher->hashPassword($admin, 'Admin123'));
         $admin->setIsVerified(true);
 
         $manager->persist($admin);
