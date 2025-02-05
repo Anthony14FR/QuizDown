@@ -36,7 +36,7 @@ class AdminFixtures extends Fixture
 
         $manager->persist($user);
 
-        for ($i = 1; $i <= 5; $i++) {
+        for ($i = 1; $i <= 5; ++$i) {
             $user = new User();
             $user->setEmail("user{$i}@orus.com");
             $user->setUsername("user{$i}");
@@ -46,7 +46,6 @@ class AdminFixtures extends Fixture
 
             $manager->persist($user);
         }
-
 
         $manager->flush();
     }
