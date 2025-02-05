@@ -592,6 +592,10 @@ class AdminController extends AbstractController
                 $user->setPassword($originalPassword);
             }
 
+            if (in_array('ROLE_BANNED', $user->getRoles())) {
+                $user->setRoles(['ROLE_BANNED']);
+            }
+
             $em->flush();
             $this->addFlash('success', 'Utilisateur modifié avec succès');
 
