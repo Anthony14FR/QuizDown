@@ -12,7 +12,7 @@ class PenaltyQuiz extends Quiz
     private ?int $penaltyPoints = null;
 
     #[ORM\Column(nullable: true)]
-    private ?int $timePenalty = null;
+    private ?int $timeLimit = null;
 
     public function getId(): ?int
     {
@@ -31,14 +31,14 @@ class PenaltyQuiz extends Quiz
         return $this;
     }
 
-    public function getTimePenalty(): ?int
+    public function getTimeLimit(): ?int
     {
-        return $this->timePenalty;
+        return $this->timeLimit;
     }
 
-    public function setTimePenalty(?int $timePenalty): static
+    public function setTimeLimit(?int $timeLimit): static
     {
-        $this->timePenalty = $timePenalty;
+        $this->timeLimit = $timeLimit;
 
         return $this;
     }

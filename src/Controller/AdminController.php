@@ -61,7 +61,7 @@ class AdminController extends AbstractController
             }
             if ($quiz instanceof PenaltyQuiz) {
                 $quiz->setPenaltyPoints($quizData['penaltyPoints'] ?? null);
-                $quiz->setTimePenalty($quizData['timePenalty'] ?? null);
+                $quiz->setTimeLimit($quizData['timeLimit'] ?? null);
             }
 
             $quiz->setCreator($this->getUser() instanceof User ? $this->getUser() : null);
@@ -105,9 +105,10 @@ class AdminController extends AbstractController
 
         $form = $this->createForm(QuizType::class, $quiz, [
             'quiz_type' => $quiz->getType(),
-            'time_limit' => $quiz instanceof TimedQuiz ? $quiz->getTimeLimit() : null,
+            'time_limit' => ($quiz instanceof TimedQuiz || $quiz instanceof PenaltyQuiz)
+                                ? $quiz->getTimeLimit()
+                                : null,
             'penalty_points' => $quiz instanceof PenaltyQuiz ? $quiz->getPenaltyPoints() : null,
-            'time_penalty' => $quiz instanceof PenaltyQuiz ? $quiz->getTimePenalty() : null,
         ]);
 
         $form->handleRequest($request);
@@ -142,13 +143,13 @@ class AdminController extends AbstractController
 
             if ($quiz instanceof PenaltyQuiz) {
                 $penaltyPoints = $form->get('penaltyPoints')->getData();
-                $timePenalty = $form->get('timePenalty')->getData();
+                $timeLimit = $form->get('timeLimit')->getData();
 
                 if (null !== $penaltyPoints) {
                     $quiz->setPenaltyPoints($penaltyPoints);
                 }
-                if (null !== $timePenalty) {
-                    $quiz->setTimePenalty($timePenalty);
+                if (null !== $timeLimit) {
+                    $quiz->setTimeLimit($timeLimit);
                 }
             }
 

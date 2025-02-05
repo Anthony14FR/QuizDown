@@ -1,50 +1,150 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-    <div class="container mx-auto p-4 max-w-3xl">
-        <div class="card bg-base-100 shadow-xl mb-6">
-            <div class="card-body">
-                <h1 class="card-title text-2xl">{{ quiz.title }}</h1>
-                <p>{{ quiz.description }}</p>
-            </div>
-        </div>
+   <div class="container mx-auto p-4 max-w-3xl">
+       <div class="card bg-base-100 shadow-xl mb-6">
+           <div class="card-body">
+               <h1 class="card-title text-2xl">{{ quiz.title }}</h1>
+               <p>{{ quiz.description }}</p>
+               {% if quiz.type == 'penalty' %}
+                   <div class="alert alert-warning">
+                       <span>Attention: -{{ quiz.penaltyPoints }} points par erreur</span>
+                   </div>
+               {% endif %}
+           </div>
+       </div>
 
-        <form method="POST" action="{{ path('app_quiz_submit', {id: quiz.id}) }}" class="space-y-6">
-            {% for question in quiz.questions %}
-                <div class="card bg-base-100 shadow-xl">
-                    <div class="card-body">
-                        <h2 class="card-title">Question {{ loop.index }}</h2>
-                        <p class="mb-4">{{ question.content }}</p>
+       <form method="POST" action="{{ path('app_quiz_submit', {id: quiz.id}) }}" class="space-y-6" id="quizForm">
+           <div class="steps w-full mb-6">
+               {% for i in 1..quiz.questions|length %}
+                   <div class="step {% if i == 1 %}step-primary{% endif %}" data-content="{{ i }}"></div>
+               {% endfor %}
+           </div>
 
-                        <div class="space-y-2">
-                            {% if question.type == 'true_false' or question.type == 'single_choice' %}
-                                {% for answer in question.answers %}
-                                    <label class="flex items-center gap-2 p-2 hover:bg-base-200 rounded-lg cursor-pointer">
-                                        <input type="radio"
-                                               name="answers[{{ question.id }}]"
-                                               value="{{ answer.id }}"
-                                               class="radio"
-                                               required>
-                                        <span>{{ answer.content }}</span>
-                                    </label>
-                                {% endfor %}
-                            {% else %}
-                                {% for answer in question.answers %}
-                                    <label class="flex items-center gap-2 p-2 hover:bg-base-200 rounded-lg cursor-pointer">
-                                        <input type="checkbox"
-                                               name="answers[{{ question.id }}][]"
-                                               value="{{ answer.id }}"
-                                               class="checkbox">
-                                        <span>{{ answer.content }}</span>
-                                    </label>
-                                {% endfor %}
-                            {% endif %}
-                        </div>
-                    </div>
-                </div>
-            {% endfor %}
+           {% for question in quiz.questions %}
+               <div class="question-card card bg-base-100 shadow-xl {% if not loop.first %}hidden{% endif %}" data-question="{{ loop.index }}">
+                   <div class="card-body">
+                       <h2 class="card-title">Question {{ loop.index }}/{{ quiz.questions|length }}</h2>
+                       {% if quiz.type == 'timed' or quiz.type == 'penalty' %}
+                           <div class="alert alert-info mb-4">
+                               <span class="timer">Temps restant: {{ quiz.timeLimit }}s</span>
+                           </div>
+                       {% endif %}
+                       <p class="mb-4">{{ question.content }}</p>
+                       <div class="space-y-2">
+                           {% if question.type == 'true_false' or question.type == 'single_choice' %}
+                               {% for answer in question.answers %}
+                                   <label class="flex items-center gap-2 p-2 hover:bg-base-200 rounded-lg cursor-pointer">
+                                       <input type="radio"
+                                              name="answers[{{ question.id }}]"
+                                              value="{{ answer.id }}"
+                                              class="radio"
+                                              required>
+                                       <span>{{ answer.content }}</span>
+                                   </label>
+                               {% endfor %}
+                           {% else %}
+                               {% for answer in question.answers %}
+                                   <label class="flex items-center gap-2 p-2 hover:bg-base-200 rounded-lg cursor-pointer">
+                                       <input type="checkbox"
+                                              name="answers[{{ question.id }}][]"
+                                              value="{{ answer.id }}"
+                                              class="checkbox">
+                                       <span>{{ answer.content }}</span>
+                                   </label>
+                               {% endfor %}
+                           {% endif %}
+                       </div>
+                       <div class="flex justify-between mt-4">
+                           {% if not loop.first and quiz.type == 'base' %}
+                               <button type="button" class="btn btn-outline prev-question">Précédent</button>
+                           {% else %}
+                               <div></div>
+                           {% endif %}
+                           {% if not loop.last %}
+                               <button type="button" class="btn btn-primary next-question">Suivant</button>
+                           {% else %}
+                               <button type="submit" class="btn btn-success">Terminer</button>
+                           {% endif %}
+                       </div>
+                   </div>
+               </div>
+           {% endfor %}
+       </form>
+   </div>
+{% endblock %}
 
-            <button type="submit" class="btn btn-primary w-full">Soumettre mes réponses</button>
-        </form>
-    </div>
+{% block javascripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+   let currentQuestion = 1;
+   const totalQuestions = {{ quiz.questions|length }};
+   
+   {% if quiz.type == 'timed' or quiz.type == 'penalty' %}
+   let timers = {};
+   
+   function startTimer(questionNumber) {
+       if (timers[questionNumber]) {
+           clearInterval(timers[questionNumber].interval);
+       }
+       
+       const timerElement = document.querySelector(`[data-question="${questionNumber}"] .timer`);
+       let timeLeft = {{ quiz.timeLimit }};
+       
+       timers[questionNumber] = {
+           timeLeft: timeLeft,
+           interval: setInterval(() => {
+               timeLeft--;
+               timerElement.textContent = `Temps restant: ${timeLeft}s`;
+               if (timeLeft <= 0) {
+                   clearInterval(timers[questionNumber].interval);
+                   if (questionNumber < totalQuestions) {
+                       currentQuestion++;
+                       showQuestion(currentQuestion);
+                   } else {
+                       document.getElementById('quizForm').submit();
+                   }
+               }
+           }, 1000)
+       };
+   }
+   {% endif %}
+   
+   function showQuestion(number) {
+       document.querySelectorAll('.question-card').forEach(card => card.classList.add('hidden'));
+       document.querySelector(`[data-question="${number}"]`).classList.remove('hidden');
+       document.querySelectorAll('.step').forEach((step, index) => {
+           if (index < number) {
+               step.classList.add('step-primary');
+           } else {
+               step.classList.remove('step-primary');
+           }
+       });
+       
+       {% if quiz.type == 'timed' or quiz.type == 'penalty' %}
+       startTimer(number);
+       {% endif %}
+   }
+
+   document.querySelectorAll('.next-question').forEach(button => {
+       button.addEventListener('click', () => {
+           currentQuestion++;
+           showQuestion(currentQuestion);
+       });
+   });
+
+   {% if quiz.type == 'base' %}
+   document.querySelectorAll('.prev-question').forEach(button => {
+       button.addEventListener('click', () => {
+           currentQuestion--;
+           showQuestion(currentQuestion);
+       });
+   });
+   {% endif %}
+
+   {% if quiz.type == 'timed' or quiz.type == 'penalty' %}
+   startTimer(1);
+   {% endif %}
+});
+</script>
 {% endblock %}
