@@ -18,8 +18,13 @@
                 {{ form_row(form.penaltyPoints, {'attr': {'class': 'input input-bordered w-full'}}) }}
                 {{ form_row(form.timePenalty, {'attr': {'class': 'input input-bordered w-full'}}) }}
             </div>
-            {{ form_row(form.categories) }}
-            {{ form_row(form.tags) }}
+            {{ form_row(form.categories, {
+            'attr': {'class': 'select select-bordered w-full min-h-16', 'multiple': 'multiple', 'size': '5'}
+            }) }}
+
+            {{ form_row(form.tags, {
+            'attr': {'class': 'select select-bordered w-full min-h-16', 'multiple': 'multiple', 'size': '5'}  
+            }) }}
             {{ form_row(form.defaultScore, {'attr': {'class': 'input input-bordered w-full'}}) }}
             {{ form_row(form.description, {'attr': {'class': 'textarea textarea-bordered w-full'}}) }}
         </div>
