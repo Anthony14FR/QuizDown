@@ -1,12 +1,32 @@
+{# reset_password/reset.html.twig #}
 {% extends 'base.html.twig' %}
 
-{% block title %}Reset your password{% endblock %}
+{% block title %}Nouveau mot de passe{% endblock %}
 
 {% block body %}
-    <h1>Reset your password</h1>
+   <div class="max-w-lg mx-auto p-6">
+       <h1 class="text-2xl font-bold text-center text-primary mb-8">Définir un nouveau mot de passe</h1>
+       
+       <div class="card bg-base-100 shadow-xl">
+           <div class="card-body">
+               {{ form_start(resetForm) }}
+                   {{ form_row(resetForm.plainPassword.first, {
+                       'label': 'Nouveau mot de passe',
+                       'attr': {
+                           'class': 'input input-bordered w-full mb-4'
+                       }
+                   }) }}
+                   
+                   {{ form_row(resetForm.plainPassword.second, {
+                       'label': 'Confirmer le mot de passe', 
+                       'attr': {
+                           'class': 'input input-bordered w-full mb-6'
+                       }
+                   }) }}
 
-    {{ form_start(resetForm) }}
-        {{ form_row(resetForm.plainPassword) }}
-        <button class="btn btn-primary">Reset password</button>
-    {{ form_end(resetForm) }}
+                   <button class="btn btn-primary w-full">Réinitialiser le mot de passe</button>
+               {{ form_end(resetForm) }}
+           </div>
+       </div>
+   </div>
 {% endblock %}
