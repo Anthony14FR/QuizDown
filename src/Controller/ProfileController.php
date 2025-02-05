@@ -12,7 +12,7 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/profile')]
-#[IsGranted('ROLE_AUSER')]
+#[IsGranted('ROLE_USER')]
 class ProfileController extends AbstractController
 {
     #[Route('', name: 'app_profile')]
