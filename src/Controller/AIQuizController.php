@@ -70,7 +70,7 @@ class AIQuizController extends AbstractController
             $quiz = new Quiz();
             $quiz->setTitle($quizData['title']);
             $quiz->setDescription($quizData['description']);
-            $quiz->setDefaultScore(0);
+            $quiz->setDefaultScore(1);
             $quiz->setCreator($this->getUser() instanceof User ? $this->getUser() : null);
 
             foreach ($quizData['questions'] as $questionData) {
