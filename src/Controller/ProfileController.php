@@ -100,4 +100,20 @@ class ProfileController extends AbstractController
 
         return $this->redirectToRoute('app_profile');
     }
+
+    #[Route('/badges', name: 'app_profile_badges')]
+    public function badges(): Response
+    {
+        $user = $this->getUser();
+
+        if (!$user instanceof User) {
+            throw new \LogicException('User is not a valid App\Entity\User.');
+        }
+
+        $badges = $user->getBadges();
+
+        return $this->render('profile/badges.html.twig', [
+            'badges' => $badges,
+        ]);
+    }
 }

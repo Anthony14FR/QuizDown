@@ -85,4 +85,21 @@ class Badge
 
         return $this;
     }
+
+    public function getImagePath(): string
+    {
+        return match ($this->getName()) {
+            'Apprenti Quizzer' => '2.png',
+            'Quiz Explorer' => '1.png',
+            'Quiz Enthusiast' => '5.png',
+            'Quiz Addict' => '6.png',
+            'Quiz Master' => '4.png',
+            'Quiz Champion' => '3.png',
+            'Quiz Virtuoso' => '7.png',
+            'Quiz Legend' => '7.png',
+            'Ultimate Quizzer' => '7.png',
+            null => '7.png',
+            default => '7.png',
+        };
+    }
 }
