@@ -265,10 +265,56 @@ class QuizController extends AbstractController
         $answers = $request->request->all('answers');
         $score = 0;
 
-        $submission = new Submission();
-        $submission->setQuiz($quiz);
-        $submission->setPlayer($this->getUser() instanceof User ? $this->getUser() : null);
-        $submission->setSubmittedAt(new \DateTimeImmutable());
+        $currentUser = $this->getUser();
+        $existingSubmission = $currentUser instanceof User ? $em->getRepository(Submission::class)
+            ->findOneBy([
+                'quiz' => $quiz,
+                'player' => $currentUser,
+            ]) : null;
+
+        foreach ($quiz->getQuestions() as $question) {
+            $userAnswer = $answers[$question->getId()] ?? null;
+            $isCorrect = false;
+
+            foreach ($question->getAnswers() as $answer) {
+                if ('true_false' === $question->getType() || 'single_choice' === $question->getType()) {
+                    if ($answer->getId() == $userAnswer && $answer->isCorrect()) {
+                        $isCorrect = true;
+                        $score += $quiz->getDefaultScore();
+                    }
+                } elseif ('multiple_choice' === $question->getType()) {
+                    $userAnswers = is_array($userAnswer) ? $userAnswer : [];
+                    $correctAnswers = $question->getAnswers()->filter(fn ($a) => $a->isCorrect())->map(fn ($a) => $a->getId())->toArray();
+                    if ($userAnswers == $correctAnswers) {
+                        $isCorrect = true;
+                        $score += $quiz->getDefaultScore();
+                    }
+                }
+            }
+        }
+
+        if ($existingSubmission) {
+            if ($score > $existingSubmission->getScore()) {
+                $existingSubmission->setScore($score);
+                $existingSubmission->setSubmittedAt(new \DateTimeImmutable());
+                $submission = $existingSubmission;
+            } else {
+                return $this->redirectToRoute('app_quiz_result', ['id' => $existingSubmission->getId()]);
+            }
+        } else {
+            $submission = new Submission();
+            $submission->setQuiz($quiz);
+            $submission->setPlayer($currentUser instanceof User ? $currentUser : null);
+            $submission->setScore($score);
+            $submission->setSubmittedAt(new \DateTimeImmutable());
+            $em->persist($submission);
+        }
+
+        if ($existingSubmission) {
+            foreach ($existingSubmission->getSubmissionAnswers() as $oldAnswer) {
+                $em->remove($oldAnswer);
+            }
+        }
 
         foreach ($quiz->getQuestions() as $question) {
             $submissionAnswer = new SubmissionAnswer();
@@ -283,16 +329,12 @@ class QuizController extends AbstractController
                 if ('true_false' === $question->getType() || 'single_choice' === $question->getType()) {
                     if ($answer->getId() == $userAnswer && $answer->isCorrect()) {
                         $isCorrect = true;
-                        $score += $quiz->getDefaultScore();
                     }
                 } elseif ('multiple_choice' === $question->getType()) {
-                    $userAnswers = is_array($userAnswer) ? array_map('intval', $userAnswer) : [];
+                    $userAnswers = is_array($userAnswer) ? $userAnswer : [];
                     $correctAnswers = $question->getAnswers()->filter(fn ($a) => $a->isCorrect())->map(fn ($a) => $a->getId())->toArray();
-                    sort($userAnswers);
-                    sort($correctAnswers);
-                    if ($userAnswers === $correctAnswers) {
+                    if ($userAnswers == $correctAnswers) {
                         $isCorrect = true;
-                        $score += $quiz->getDefaultScore();
                     }
                 }
             }
@@ -301,8 +343,6 @@ class QuizController extends AbstractController
             $em->persist($submissionAnswer);
         }
 
-        $submission->setScore($score);
-        $em->persist($submission);
         $em->flush();
 
         return $this->redirectToRoute('app_quiz_result', ['id' => $submission->getId()]);

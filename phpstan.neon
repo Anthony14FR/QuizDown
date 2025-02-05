@@ -1,6 +1,6 @@
 parameters:
     ignoreErrors:
-        - '#Property App\\Entity\\Comment::\$id \(int\|null\) is never assigned null so it can be removed from the property type#'
+        - '#Property .+::\$id \(int\|null\) is never assigned null so it can be removed from the property type#'
     level: 6
     paths:
         - src

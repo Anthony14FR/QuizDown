@@ -13,7 +13,7 @@ class Submission
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    private int $id = 0;
+    private ?int $id = 0;
 
     #[ORM\Column]
     private ?\DateTimeImmutable $submittedAt = null;
