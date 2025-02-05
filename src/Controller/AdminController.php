@@ -105,9 +105,10 @@ class AdminController extends AbstractController
 
         $form = $this->createForm(QuizType::class, $quiz, [
             'quiz_type' => $quiz->getType(),
-            'time_limit' => $quiz instanceof TimedQuiz ? $quiz->getTimeLimit() : null,
+            'time_limit' => ($quiz instanceof TimedQuiz || $quiz instanceof PenaltyQuiz)
+                                ? $quiz->getTimeLimit()
+                                : null,
             'penalty_points' => $quiz instanceof PenaltyQuiz ? $quiz->getPenaltyPoints() : null,
-            'time_limit' => $quiz instanceof PenaltyQuiz ? $quiz->getTimeLimit() : null,
         ]);
 
         $form->handleRequest($request);

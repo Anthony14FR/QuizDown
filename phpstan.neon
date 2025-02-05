@@ -1,6 +1,7 @@
 parameters:
     ignoreErrors:
         - '#Property .+::\$id \(int\|null\) is never assigned null so it can be removed from the property type#'
+        - '#Property .+::\$score \(int\|null\) is never assigned null so it can be removed#'
     level: 6
     paths:
         - src
