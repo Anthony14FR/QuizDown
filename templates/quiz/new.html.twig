@@ -5,7 +5,7 @@
 {% block body %}
     <div class="container mx-auto p-4 max-w-4xl">
         <h1 class="text-xl font-bold mb-4">Créer un nouveau Quiz</h1>
-        
+
         {{ form_start(form) }}
             <div class="card bg-base-100 shadow p-6 mb-6">
                 <div class="row">
@@ -46,7 +46,7 @@
                     </div>
                     <div class="mb-4">
                         {{ form_row(form.tags, {
-                        'attr': {'class': 'select select-bordered w-full min-h-16', 'multiple': 'multiple', 'size': '5'}  
+                        'attr': {'class': 'select select-bordered w-full min-h-16', 'multiple': 'multiple', 'size': '5'}
                         }) }}
                     </div>
                     <div class="col-md-3">
@@ -54,24 +54,24 @@
                             'attr': {'class': 'input input-bordered w-full'}
                         }) }}
                     </div>
-                </div>  
-                
+                </div>
+
                 {{ form_row(form.description, {
                     'attr': {'class': 'textarea textarea-bordered w-full'}
                 }) }}
             </div>
-            
+
             <div class="questions-wrapper mt-4">
                 <h3 class="text-xl font-bold mb-4">Questions</h3>
-                <div class="questions-collection" 
+                <div class="questions-collection"
                      data-index="{{ form.questions|length > 0 ? form.questions|length : 0 }}">
                 </div>
-                
+
                 <button type="button" class="btn btn-primary mt-4 add-question">
                     <i class="fas fa-plus"></i> Ajouter une question
                 </button>
             </div>
-            
+
             <button type="submit" class="btn btn-success mt-6">Créer le quiz</button>
         {{ form_end(form) }}
 
@@ -80,7 +80,7 @@
                 <div class="row">
                     <div class="col-md-9">
                         <div class="form-group">
-                            <input type="text" 
+                            <input type="text"
                                    name="quiz[questions][__name__][content]"
                                    required="required"
                                    class="input input-bordered w-full mb-4"
@@ -88,7 +88,7 @@
                         </div>
                     </div>
                     <div class="col-md-3">
-                        <select name="quiz[questions][__name__][type]" 
+                        <select name="quiz[questions][__name__][type]"
                                 class="select select-bordered w-full mb-4"
                                 required="required">
                             <option value="true_false">Vrai / Faux</option>
@@ -113,7 +113,7 @@
 
        <template id="answer-template">
             <div class="answer-item bg-base-100 p-3 rounded-lg mb-2">
-                <input type="text" name="quiz[questions][__question_name__][answers][__name__][content]" 
+                <input type="text" name="quiz[questions][__question_name__][answers][__name__][content]"
                     required class="input input-bordered w-full mb-2" placeholder="Votre réponse">
                 <div class="flex items-center gap-2">
                     <input type="radio"
@@ -160,44 +160,44 @@
 
             typeSelect.addEventListener('change', updateFields);
             updateFields();
-            
+
             document.querySelector('.add-question').addEventListener('click', function() {
                 const questionIndex = parseInt(questionsCollection.dataset.index);
-                
+
                 const newQuestion = questionTemplate.content.cloneNode(true);
-                
+
                 newQuestion.querySelectorAll('[name*="__name__"]').forEach(input => {
                     input.name = input.name.replace('__name__', questionIndex);
                 });
-                
+
                 const questionBlock = newQuestion.querySelector('.question-item');
-                
+
                 questionBlock.querySelector('.add-answer').addEventListener('click', function() {
                     addAnswer(questionBlock.querySelector('.answers-collection'), questionIndex);
                 });
-                
+
                 questionBlock.querySelector('.remove-question').addEventListener('click', function() {
                     questionBlock.remove();
                 });
-                
+
                 questionsCollection.appendChild(newQuestion);
                 questionsCollection.dataset.index = questionIndex + 1;
-                
+
                 addAnswer(questionBlock.querySelector('.answers-collection'), questionIndex);
                 addAnswer(questionBlock.querySelector('.answers-collection'), questionIndex);
             });
-            
+
             function addAnswer(answersCollection, questionIndex) {
                 const answerIndex = parseInt(answersCollection.dataset.index);
-                
+
                 const newAnswer = answerTemplate.content.cloneNode(true);
-                
+
                 newAnswer.querySelectorAll('[name*="__question_name__"]').forEach(input => {
                     input.name = input.name
                         .replace('__question_name__', questionIndex)
                         .replace('__name__', answerIndex);
                 });
-                
+
                 const answerBlock = newAnswer.querySelector('.answer-item');
                 answerBlock.querySelector('.remove-answer').addEventListener('click', function() {
                     answerBlock.remove();
@@ -211,11 +211,19 @@
                     }
                     this.wasChecked = this.checked;
                 });
-                
+
+                const questionTypeSelect = answersCollection.closest('.question-item').querySelector('select[name*="[type]"]');
+                if (questionTypeSelect && questionTypeSelect.value === 'true_false') {
+                    answerBlock.querySelector('input[type="text"]').value = answerIndex === 0 ? 'Vrai' : 'Faux';
+                    if (answerIndex === 0) {
+                        newRadio.checked = true;
+                    }
+                }
+
                 answersCollection.appendChild(newAnswer);
                 answersCollection.dataset.index = answerIndex + 1;
             }
-            
+
             document.addEventListener('click', function(e) {
                 if (e.target.closest('.remove-answer')) {
                     e.target.closest('.answer-block').remove();
