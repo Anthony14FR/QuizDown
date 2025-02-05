@@ -21,10 +21,10 @@
                                         <div class="stat-value text-primary" style="--value:{{ stats.average_score * 5 }};">{{ stats.average_score ?? 0 }}/20</div>
                                         <p class="mt-2 text-sm">Note moyenne</p>
                                     </div>
-                                    <div class="text-center">
+                                    <a href="{{ path('app_profile_badges') }}"><div class="text-center">
                                         <div class="stat-value text-primary">{{ stats.total_badges }}</div>
                                         <p class="text-sm">Badges</p>
-                                     </div>
+                                    </div></a>
                                 </div>
                             </div>
                         </div>

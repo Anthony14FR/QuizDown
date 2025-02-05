@@ -100,4 +100,16 @@ class ProfileController extends AbstractController
 
         return $this->redirectToRoute('app_profile');
     }
+
+    #[Route('/badges', name: 'app_profile_badges')]
+    public function badges(): Response
+    {
+        $user = $this->getUser();
+
+        $badges = $user->getBadges();
+
+        return $this->render('profile/badges.html.twig', [
+            'badges' => $badges,
+        ]);
+    }
 }
