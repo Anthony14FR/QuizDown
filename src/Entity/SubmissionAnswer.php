@@ -12,7 +12,7 @@ class SubmissionAnswer
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: Types::INTEGER)]
-    private int $id = 0;
+    private ?int $id = 0;
 
     /**
      * @var array<int, int>|string|null

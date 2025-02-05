@@ -44,7 +44,7 @@
             <a href="{{ path('app_quiz_new') }}" class="btn btn-primary">
                 Créer un nouveau quiz
             </a>
-            <a href="{{ path('app_quiz_ai_new') }}" class="btn btn-secondary">
+            <a href="{{ path('app_quiz_ai_new') }}" class="btn btn-accent">
                 Créer un nouveau quiz avec l'IA
             </a>
         </div>
@@ -63,10 +63,10 @@
                     </div>
 
                     <div class="card-actions justify-between items-center">
-                        <a href="{{ path('app_quiz_play', {'id': quiz.getId()}) }}" class="btn btn-primary btn-sm">
+                        <a href="{{ path('app_quiz_play', {'id': quiz.getId()}) }}" class="btn btn-secondary btn-sm">
                             Commencer le quiz
                         </a>
-                        <a href="{{ path('app_quiz_detail', {'id': quiz.getId()}) }}" class="btn btn-primary btn-sm">
+                        <a href="{{ path('app_quiz_detail', {'id': quiz.getId()}) }}" class="btn btn-info btn-sm">
                             Détail du quiz
                         </a>
 

@@ -18,7 +18,7 @@ class Question
     #[ORM\GeneratedValue]
     #[ORM\Column]
     #[Groups(['quiz:read:full'])]
-    private int $id = 0;
+    private ?int $id = 0;
 
     #[ORM\Column(length: 255)]
     #[Groups(['quiz:read:full'])]
