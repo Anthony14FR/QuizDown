@@ -12,7 +12,7 @@ cd QuizDown
 cp .env.dev .env
 composer install
 npm i && npm run dev
-docker compose -f compose.dev.yaml up -d
+docker compose up -d
 make reset
 ```
 
