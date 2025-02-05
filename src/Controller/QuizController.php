@@ -43,7 +43,7 @@ class QuizController extends AbstractController
         $order = $request->query->get('order', 'desc');
         $searchTerm = $request->query->get('q', '');
         $page = max((int) $request->query->get('page', 1), 1);
-        $limit = max((int) $request->query->get('limit', 5), 1);
+        $limit = max((int) $request->query->get('limit', 6), 1);
 
         $totalQuizzes = $this->quizRepository->countFilteredQuizzes($category, $tag, $searchTerm);
 
@@ -360,6 +360,7 @@ class QuizController extends AbstractController
                     $isCorrect = true;
                 }
             }
+
             $submissionAnswer->setIsCorrect($isCorrect);
 
             $em->persist($submissionAnswer);

@@ -53,7 +53,7 @@ class AIQuizController extends AbstractController
                 'messages' => [
                     [
                         'role' => 'system',
-                        'content' => 'Tu dois générer un quiz au format JSON avec la structure suivante: {title: string, description: string, questions: [{content: string, type: string (true_false, single_choice, multiple_choice), answers: [{content: string, isCorrect: boolean}]}]} Fait bien attention à ce que la question et ses réponses correspondent à sont type de questions',
+                        'content' => 'Tu dois générer un quiz au format JSON avec la structure suivante: {title: string, description: string, questions: [{content: string, type: string (true_false, single_choice, multiple_choice), answers: [{content: string, isCorrect: boolean}]}]} Fait bien attention à ce que la question et ses réponses correspondent à sont type de questions. IMPORTANT LE FORMAT DE REPONSE DOIT ABSOLUMENT ETRE RESPECTE !',
                     ],
                     [
                         'role' => 'user',
@@ -62,34 +62,39 @@ class AIQuizController extends AbstractController
                 ],
             ],
         ]);
+        try {
+            $responseData = json_decode($response->getContent(), true)['choices'][0]['message'];
+            $jsonString = trim(str_replace(['```json', '```'], '', $responseData['content']));
+            $quizData = json_decode($jsonString, true);
 
-        $responseData = json_decode($response->getContent(), true)['choices'][0]['message'];
-        $jsonString = trim(str_replace(['```json', '```'], '', $responseData['content']));
-        $quizData = json_decode($jsonString, true);
+            $quiz = new Quiz();
+            $quiz->setTitle($quizData['title']);
+            $quiz->setDescription($quizData['description']);
+            $quiz->setDefaultScore(1);
+            $quiz->setCreator($this->getUser() instanceof User ? $this->getUser() : null);
 
-        $quiz = new Quiz();
-        $quiz->setTitle($quizData['title']);
-        $quiz->setDescription($quizData['description']);
-        $quiz->setDefaultScore(0);
-        $quiz->setCreator($this->getUser() instanceof User ? $this->getUser() : null);
+            foreach ($quizData['questions'] as $questionData) {
+                $question = new Question();
+                $question->setContent($questionData['content']);
+                $question->setType($questionData['type']);
 
-        foreach ($quizData['questions'] as $questionData) {
-            $question = new Question();
-            $question->setContent($questionData['content']);
-            $question->setType($questionData['type']);
-
-            foreach ($questionData['answers'] as $answerData) {
-                $answer = new Answer();
-                $answer->setContent($answerData['content']);
-                $answer->setIsCorrect($answerData['isCorrect']);
-                $question->addAnswer($answer);
+                foreach ($questionData['answers'] as $answerData) {
+                    $answer = new Answer();
+                    $answer->setContent($answerData['content']);
+                    $answer->setIsCorrect($answerData['isCorrect']);
+                    $question->addAnswer($answer);
+                }
+                $quiz->addQuestion($question);
             }
-            $quiz->addQuestion($question);
+
+            $em->persist($quiz);
+            $em->flush();
+
+            return $this->redirectToRoute('app_quiz_edit', ['id' => $quiz->getId()]);
+        } catch (\Exception $e) {
+            $this->addFlash('error', 'Erreur lors de la génération du quiz');
+
+            return $this->redirectToRoute('app_quiz_ai_new');
         }
-
-        $em->persist($quiz);
-        $em->flush();
-
-        return $this->redirectToRoute('app_quiz_edit', ['id' => $quiz->getId()]);
     }
 }
