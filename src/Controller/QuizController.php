@@ -368,6 +368,18 @@ class QuizController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            if (empty($comment->getContent())) {
+                $this->addFlash('error', 'Vous devez être connecté pour commenter.');
+
+                return $this->redirectToRoute('app_quiz_detail', ['id' => $quiz->getId()]);
+            }
+
+            if (strlen($comment->getContent()) < 5 || strlen($comment->getContent()) > 200) {
+                $this->addFlash('error', 'Le commentaire doit contenir entre 5 et 200 caractères.');
+
+                return $this->redirectToRoute('app_quiz_detail', ['id' => $quiz->getId()]);
+            }
+
             $em->persist($comment);
             $em->flush();
             $this->addFlash('success', 'Commentaire ajouté avec succès');
