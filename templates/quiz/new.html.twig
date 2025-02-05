@@ -19,21 +19,15 @@
                             'attr': {'class': 'select select-bordered w-full'}
                         }) }}
                     </div>
-                    <div id="timed-fields" style="display: none;">
-                        <div class="col-md-12">
-                            {{ form_row(form.timeLimit, {
-                                'attr': {'class': 'input input-bordered w-full'}
-                            }) }}
-                        </div>
-                    </div>
-
                     <div id="penalty-fields" style="display: none;">
                         <div class="col-md-6">
                             {{ form_row(form.penaltyPoints, {
                                 'attr': {'class': 'input input-bordered w-full'}
                             }) }}
                         </div>
-                        <div class="col-md-6">
+                    </div>
+                    <div id="timed-fields" style="display: none;">
+                        <div class="col-md-12">
                             {{ form_row(form.timeLimit, {
                                 'attr': {'class': 'input input-bordered w-full'}
                             }) }}
@@ -150,7 +144,7 @@
                     timedFields.style.display = 'block';
                     penaltyFields.style.display = 'none';
                 } else if (quizType === 'penalty') {
-                    timedFields.style.display = 'none';
+                    timedFields.style.display = 'block';
                     penaltyFields.style.display = 'block';
                 } else {
                     timedFields.style.display = 'none';

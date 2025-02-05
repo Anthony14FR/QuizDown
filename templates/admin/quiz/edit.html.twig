@@ -10,12 +10,10 @@
         <div class="card bg-base-100 shadow p-6 mb-6">
             {{ form_row(form.title, {'attr': {'class': 'input input-bordered w-full'}}) }}
             {{ form_row(form.type, {'attr': {'class': 'select select-bordered w-full'}}) }}
-                        <div id="timed-fields" style="display: {{ quiz.getType() == 'timed' ? 'block' : 'none' }};">
-                {{ form_row(form.timeLimit, {'attr': {'class': 'input input-bordered w-full'}}) }}
-            </div>
-
             <div id="penalty-fields" style="display: {{ quiz.getType() == 'penalty' ? 'block' : 'none' }};">
                 {{ form_row(form.penaltyPoints, {'attr': {'class': 'input input-bordered w-full'}}) }}
+            </div>
+            <div id="timed-fields" style="display: {{ quiz.getType() == 'timed' ? 'block' : 'none' }};">
                 {{ form_row(form.timeLimit, {'attr': {'class': 'input input-bordered w-full'}}) }}
             </div>
             {{ form_row(form.categories, {
@@ -127,7 +125,7 @@
 
             function updateFields() {
                 const quizType = typeSelect.value;
-                timedFields.style.display = (quizType === 'timed') ? 'block' : 'none';
+                timedFields.style.display = (quizType === 'timed' || quizType === 'penalty') ? 'block' : 'none';
                 penaltyFields.style.display = (quizType === 'penalty') ? 'block' : 'none';
             }
 
