@@ -19,7 +19,7 @@ class Submission
     private ?\DateTimeImmutable $submittedAt = null;
 
     #[ORM\Column]
-    private ?int $score = null;
+    private ?int $score = 0;
 
     /**
      * @var Collection<int, SubmissionAnswer>

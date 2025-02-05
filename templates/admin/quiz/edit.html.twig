@@ -16,7 +16,7 @@
 
             <div id="penalty-fields" style="display: {{ quiz.getType() == 'penalty' ? 'block' : 'none' }};">
                 {{ form_row(form.penaltyPoints, {'attr': {'class': 'input input-bordered w-full'}}) }}
-                {{ form_row(form.timePenalty, {'attr': {'class': 'input input-bordered w-full'}}) }}
+                {{ form_row(form.timeLimit, {'attr': {'class': 'input input-bordered w-full'}}) }}
             </div>
             {{ form_row(form.categories, {
                 'attr': {'class': 'select select-bordered w-full min-h-16', 'multiple': 'multiple', 'size': '5'}

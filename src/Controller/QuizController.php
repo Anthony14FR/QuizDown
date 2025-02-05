@@ -113,7 +113,7 @@ class QuizController extends AbstractController
             }
             if ($quiz instanceof PenaltyQuiz) {
                 $quiz->setPenaltyPoints($quizData['penaltyPoints'] ?? null);
-                $quiz->setTimePenalty($quizData['timePenalty'] ?? null);
+                $quiz->setTimeLimit($quizData['timeLimit'] ?? null);
             }
 
             foreach ($quiz->getCategories() as $category) {
@@ -160,7 +160,7 @@ class QuizController extends AbstractController
             'quiz_type' => $quiz->getType(),
             'time_limit' => $quiz instanceof TimedQuiz ? $quiz->getTimeLimit() : null,
             'penalty_points' => $quiz instanceof PenaltyQuiz ? $quiz->getPenaltyPoints() : null,
-            'time_penalty' => $quiz instanceof PenaltyQuiz ? $quiz->getTimePenalty() : null,
+            'time_limit' => $quiz instanceof PenaltyQuiz ? $quiz->getTimeLimit() : null,
         ]);
 
         $form->handleRequest($request);
@@ -195,13 +195,13 @@ class QuizController extends AbstractController
 
             if ($quiz instanceof PenaltyQuiz) {
                 $penaltyPoints = $form->get('penaltyPoints')->getData();
-                $timePenalty = $form->get('timePenalty')->getData();
+                $timeLimit = $form->get('timeLimit')->getData();
 
                 if (null !== $penaltyPoints) {
                     $quiz->setPenaltyPoints($penaltyPoints);
                 }
-                if (null !== $timePenalty) {
-                    $quiz->setTimePenalty($timePenalty);
+                if (null !== $timeLimit) {
+                    $quiz->setTimeLimit($timeLimit);
                 }
             }
 
@@ -256,73 +256,270 @@ class QuizController extends AbstractController
             },
         ]), true);
 
+        $quizData['type'] = match(true) {
+            $quiz instanceof TimedQuiz => 'timed',
+            $quiz instanceof PenaltyQuiz => 'penalty',
+            default => 'base'
+        };
+    
+        if ($quiz instanceof TimedQuiz) {
+            $quizData['timeLimit'] = $quiz->getTimeLimit();
+        }
+    
+        if ($quiz instanceof PenaltyQuiz) {
+            $quizData['penaltyPoints'] = $quiz->getPenaltyPoints();
+            $quizData['timeLimit'] = $quiz->getTimeLimit();
+        }
+
         return $this->render('quiz/play.html.twig', [
             'quiz' => $quizData,
         ]);
     }
+
+    // #[Route('/{id}/submit', name: 'app_quiz_submit', methods: ['POST'])]
+    // public function submit(Request $request, Quiz $quiz, EntityManagerInterface $em): Response
+    // {
+    //     $answers = $request->request->all('answers');
+    //     $score = 0;
+    //     $currentUser = $this->getUser();
+        
+    //     $submission = new Submission();
+    //     $submission->setQuiz($quiz);
+    //     $submission->setPlayer($currentUser instanceof User ? $currentUser : null);
+    //     $submission->setSubmittedAt(new \DateTimeImmutable());
+
+    //     foreach ($quiz->getQuestions() as $question) {
+    //         $userAnswer = $answers[$question->getId()] ?? null;
+    //         $submissionAnswer = new SubmissionAnswer();
+    //         $submissionAnswer->setQuestion($question);
+    //         $submissionAnswer->setSubmission($submission);
+    //         $submissionAnswer->setUserAnswer($userAnswer);
+
+    //         $isCorrect = false;
+    //         foreach ($question->getAnswers() as $answer) {
+    //             if ('true_false' === $question->getType() || 'single_choice' === $question->getType()) {
+    //                 if ($answer->getId() == $userAnswer && $answer->isCorrect()) {
+    //                     $isCorrect = true;
+    //                     $score += $quiz->getDefaultScore();
+    //                 }
+    //             } elseif ('multiple_choice' === $question->getType()) {
+    //                 $userAnswers = is_array($userAnswer) ? $userAnswer : [];
+    //                 $correctAnswers = $question->getAnswers()->filter(fn ($a) => $a->isCorrect())->map(fn ($a) => $a->getId())->toArray();
+    //                 if ($userAnswers == $correctAnswers) {
+    //                     $isCorrect = true;
+    //                     $score += $quiz->getDefaultScore();
+    //                 }
+    //             }
+    //         }
+            
+    //         $submissionAnswer->setIsCorrect($isCorrect);
+    //         $em->persist($submissionAnswer);
+    //     }
+
+    //     $existingSubmission = $currentUser instanceof User ? $em->getRepository(Submission::class)
+    //         ->findOneBy([
+    //             'quiz' => $quiz,
+    //             'player' => $currentUser,
+    //         ]) : null;
+
+    //     if ($existingSubmission && $existingSubmission->getScore() >= $score) {
+    //         return $this->redirectToRoute('app_quiz_result', ['id' => $existingSubmission->getId()]);
+    //     }
+
+    //     $submission->setScore($score);
+    //     $em->persist($submission);
+    //     $em->flush();
+
+    //     return $this->redirectToRoute('app_quiz_result', ['id' => $submission->getId()]);
+    // }
+
+    // #[Route('/{id}/submit', name: 'app_quiz_submit', methods: ['POST'])]
+    // public function submit(Request $request, Quiz $quiz, EntityManagerInterface $em): Response
+    // {
+    //     $answers = $request->request->all('answers');
+    //     $score = 0;
+    //     $currentUser = $this->getUser();
+
+    //     foreach ($quiz->getQuestions() as $question) {
+    //         $userAnswer = $answers[$question->getId()] ?? null;
+            
+    //         if ('true_false' === $question->getType() || 'single_choice' === $question->getType()) {
+    //             foreach ($question->getAnswers() as $answer) {
+    //                 if ($answer->getId() == $userAnswer && $answer->isCorrect()) {
+    //                     $score += $quiz->getDefaultScore();
+    //                 }
+    //             }
+    //         } elseif ('multiple_choice' === $question->getType()) {
+    //             $userAnswers = is_array($userAnswer) ? $userAnswer : [];
+    //             $correctAnswers = $question->getAnswers()->filter(fn ($a) => $a->isCorrect())->map(fn ($a) => $a->getId())->toArray();
+    //             if ($userAnswers == $correctAnswers) {
+    //                 $score += $quiz->getDefaultScore();
+    //             }
+    //         }
+    //     }
+
+    //     $submission = $currentUser instanceof User ? $em->getRepository(Submission::class)
+    //         ->findOneBy([
+    //             'quiz' => $quiz,
+    //             'player' => $currentUser,
+    //         ]) : null;
+
+    //     if (!$submission || $score > $submission->getScore()) {
+    //         if (!$submission) {
+    //             $submission = new Submission();
+    //             $submission->setQuiz($quiz);
+    //             $submission->setPlayer($currentUser instanceof User ? $currentUser : null);
+    //         } else {
+    //             foreach ($submission->getSubmissionAnswers() as $oldAnswer) {
+    //                 $em->remove($oldAnswer);
+    //             }
+    //         }
+
+    //         $submission->setScore($score);
+    //         $submission->setSubmittedAt(new \DateTimeImmutable('now', new \DateTimeZone('Europe/Paris')));
+
+    //         foreach ($quiz->getQuestions() as $question) {
+    //             $submissionAnswer = new SubmissionAnswer();
+    //             $submissionAnswer->setQuestion($question);
+    //             $submissionAnswer->setSubmission($submission);
+    //             $submissionAnswer->setUserAnswer($answers[$question->getId()] ?? null);
+                
+    //             $isCorrect = false;
+    //             if ('true_false' === $question->getType() || 'single_choice' === $question->getType()) {
+    //                 foreach ($question->getAnswers() as $answer) {
+    //                     if ($answer->getId() == ($answers[$question->getId()] ?? null) && $answer->isCorrect()) {
+    //                         $isCorrect = true;
+    //                     }
+    //                 }
+    //             } elseif ('multiple_choice' === $question->getType()) {
+    //                 $userAnswers = is_array($answers[$question->getId()] ?? null) ? $answers[$question->getId()] : [];
+    //                 $correctAnswers = $question->getAnswers()->filter(fn ($a) => $a->isCorrect())->map(fn ($a) => $a->getId())->toArray();
+    //                 if ($userAnswers == $correctAnswers) {
+    //                     $isCorrect = true;
+    //                 }
+    //             }
+                
+    //             $submissionAnswer->setIsCorrect($isCorrect);
+    //             $em->persist($submissionAnswer);
+    //         }
+
+    //         $em->persist($submission);
+    //         $em->flush();
+    //     }
+
+    //     return $this->redirectToRoute('app_quiz_result', ['id' => $submission->getId()]);
+    // }
 
     #[Route('/{id}/submit', name: 'app_quiz_submit', methods: ['POST'])]
     public function submit(Request $request, Quiz $quiz, EntityManagerInterface $em): Response
     {
         $answers = $request->request->all('answers');
         $score = 0;
+        $penaltyPoints = 0;
         $currentUser = $this->getUser();
-        
-        $submission = new Submission();
-        $submission->setQuiz($quiz);
-        $submission->setPlayer($currentUser instanceof User ? $currentUser : null);
-        $submission->setSubmittedAt(new \DateTimeImmutable());
+
+        if ($quiz instanceof PenaltyQuiz) {
+            $penaltyPoints = $quiz->getPenaltyPoints() ?? 0;
+        }
 
         foreach ($quiz->getQuestions() as $question) {
             $userAnswer = $answers[$question->getId()] ?? null;
+            $answeredCorrectly = false;
+
+            if ('true_false' === $question->getType() || 'single_choice' === $question->getType()) {
+                foreach ($question->getAnswers() as $answer) {
+                    if ($answer->getId() == $userAnswer && $answer->isCorrect()) {
+                        $score += $quiz->getDefaultScore();
+                        $answeredCorrectly = true;
+                        break;
+                    }
+                }
+            } elseif ('multiple_choice' === $question->getType()) {
+                $userAnswers = is_array($userAnswer) ? $userAnswer : [];
+                $correctAnswers = $question->getAnswers()->filter(fn ($a) => $a->isCorrect())->map(fn ($a) => $a->getId())->toArray();
+                if ($userAnswers == $correctAnswers) {
+                    $score += $quiz->getDefaultScore();
+                    $answeredCorrectly = true;
+                }
+            }
+
+            if ($quiz instanceof PenaltyQuiz && !$answeredCorrectly && $penaltyPoints > 0) {
+                $score -= $penaltyPoints;
+            }
+        }
+
+        if ($score < 0) {
+            $score = 0;
+        }
+
+        $submission = $em->getRepository(Submission::class)->findOneBy([
+            'quiz' => $quiz,
+            'player' => $currentUser,
+        ]);
+
+        if (!$submission) {
+            $submission = new Submission();
+            $submission->setQuiz($quiz);
+            $submission->setPlayer($currentUser instanceof User ? $currentUser : null);
+        } else {
+            foreach ($submission->getSubmissionAnswers() as $oldAnswer) {
+                $em->remove($oldAnswer);
+            }
+            $submission->getSubmissionAnswers()->clear();
+        }
+
+        $submission->setSubmittedAt(new \DateTimeImmutable('now', new \DateTimeZone('Europe/Paris')));
+
+        foreach ($quiz->getQuestions() as $question) {
+            $userAnswer = $answers[$question->getId()] ?? null;
+
             $submissionAnswer = new SubmissionAnswer();
             $submissionAnswer->setQuestion($question);
             $submissionAnswer->setSubmission($submission);
             $submissionAnswer->setUserAnswer($userAnswer);
 
             $isCorrect = false;
-            foreach ($question->getAnswers() as $answer) {
-                if ('true_false' === $question->getType() || 'single_choice' === $question->getType()) {
+            if ('true_false' === $question->getType() || 'single_choice' === $question->getType()) {
+                foreach ($question->getAnswers() as $answer) {
                     if ($answer->getId() == $userAnswer && $answer->isCorrect()) {
                         $isCorrect = true;
-                        $score += $quiz->getDefaultScore();
-                    }
-                } elseif ('multiple_choice' === $question->getType()) {
-                    $userAnswers = is_array($userAnswer) ? $userAnswer : [];
-                    $correctAnswers = $question->getAnswers()->filter(fn ($a) => $a->isCorrect())->map(fn ($a) => $a->getId())->toArray();
-                    if ($userAnswers == $correctAnswers) {
-                        $isCorrect = true;
-                        $score += $quiz->getDefaultScore();
+                        break;
                     }
                 }
+            } elseif ('multiple_choice' === $question->getType()) {
+                $userAnswers = is_array($userAnswer) ? $userAnswer : [];
+                $correctAnswers = $question->getAnswers()->filter(fn($a) => $a->isCorrect())->map(fn($a) => $a->getId())->toArray();
+                if ($userAnswers == $correctAnswers) {
+                    $isCorrect = true;
+                }
             }
-            
             $submissionAnswer->setIsCorrect($isCorrect);
+
             $em->persist($submissionAnswer);
         }
 
-        $existingSubmission = $currentUser instanceof User ? $em->getRepository(Submission::class)
-            ->findOneBy([
-                'quiz' => $quiz,
-                'player' => $currentUser,
-            ]) : null;
-
-        if ($existingSubmission && $existingSubmission->getScore() >= $score) {
-            return $this->redirectToRoute('app_quiz_result', ['id' => $existingSubmission->getId()]);
+        $bestScore = $submission->getScore() ?? 0;
+        if ($score > $bestScore) {
+            $submission->setScore($score);
         }
 
-        $submission->setScore($score);
         $em->persist($submission);
         $em->flush();
 
-        return $this->redirectToRoute('app_quiz_result', ['id' => $submission->getId()]);
+        return $this->redirectToRoute('app_quiz_result', [
+            'id' => $submission->getId(),
+            'attemptScore' => $score
+        ]);
     }
 
     #[Route('/result/{id}', name: 'app_quiz_result')]
-    public function result(Submission $submission): Response
+    public function result(Submission $submission, Request $request): Response
     {
+        $attemptScore = $request->query->get('attemptScore');
+
         return $this->render('quiz/result.html.twig', [
             'submission' => $submission,
+            'attemptScore' => $attemptScore,
         ]);
     }
 
