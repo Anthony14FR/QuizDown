@@ -106,6 +106,10 @@ class ProfileController extends AbstractController
     {
         $user = $this->getUser();
 
+        if (!$user instanceof User) {
+            throw new \LogicException('User is not a valid App\Entity\User.');
+        }
+
         $badges = $user->getBadges();
 
         return $this->render('profile/badges.html.twig', [
