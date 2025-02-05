@@ -1,17 +1,41 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-    <div class="hero bg-base-200 h-[70vh]">
+    <div class="hero bg-base-200 min-h-[85vh]">
         <div class="hero-content text-center">
-            <div class="max-w-xl px-4">
-                <h1 class="text-4xl lg:text-5xl font-bold mb-4">QuizDown</h1>
-                <p class="text-lg lg:text-xl mb-8">La plateforme interactive pour créer, partager et tester vos connaissances</p>
-                <div class="flex flex-col sm:flex-row justify-center gap-4">
-                    <a href="{{ path('app_login') }}" class="btn btn-primary w-full sm:w-auto"><i class="fas fa-sign-in-alt mr-2"></i>Se connecter</a>
-                    <a href="{{ path('app_register') }}" class="btn btn-secondary w-full sm:w-auto"><i class="fas fa-user-plus mr-2"></i>S'inscrire</a>
+            <div class="max-w-2xl px-4">
+                <h1 class="text-5xl lg:text-6xl font-bold mb-6 text-base-content">QuizDown</h1>
+                <p class="text-xl lg:text-2xl mb-8 text-base-content/80">La plateforme interactive qui révolutionne l'apprentissage par le quiz. Créez, partagez et testez vos connaissances dans une communauté dynamique et engagée.</p>
+                <div class="stats bg-base-100 shadow flex-wrap justify-center gap-2 mb-8">
+                    <div class="stat">
+                        <div class="stat-figure text-primary">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="w-8 h-8 stroke-current"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        </div>
+                        <div class="stat-title">Quiz Créés</div>
+                        <div class="stat-value text-primary">1.2K</div>
+                        <div class="stat-desc">↗︎ +150 ce mois</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-figure text-secondary">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="w-8 h-8 stroke-current"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path></svg>
+                        </div>
+                        <div class="stat-title">Utilisateurs</div>
+                        <div class="stat-value text-secondary">15K</div>
+                        <div class="stat-desc">↗︎ +500 cette semaine</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-figure text-accent">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="w-8 h-8 stroke-current"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"></path></svg>
+                        </div>
+                        <div class="stat-title">Quiz Complétés</div>
+                        <div class="stat-value text-accent">85K</div>
+                        <div class="stat-desc">↗︎ +2500 aujourd'hui</div>
+                    </div>
                 </div>
-                <div class="mt-8 animate-bounce">
-                    <i class="fas fa-chevron-down text-2xl"></i>
+
+                <div class="flex flex-col sm:flex-row justify-center gap-4 mb-8">
+                    <a href="{{ path('app_login') }}" class="btn btn-primary btn-lg"><i class="fas fa-sign-in-alt mr-2"></i>Se connecter</a>
+                    <a href="{{ path('app_register') }}" class="btn btn-secondary btn-lg"><i class="fas fa-user-plus mr-2"></i>S'inscrire</a>
                 </div>
             </div>
         </div>
@@ -19,34 +43,54 @@
 
     <section class="py-16 bg-base-100">
         <div class="container mx-auto px-4">
-            <h2 class="text-3xl lg:text-4xl font-bold text-center mb-12">Fonctionnalités</h2>
+            <h2 class="text-4xl lg:text-5xl font-bold text-center mb-6 text-base-content">Pourquoi choisir QuizDown ?</h2>
+            <p class="text-xl text-center mb-12 max-w-3xl mx-auto text-base-content/80">Notre plateforme combine technologie avancée et pédagogie moderne pour offrir une expérience d'apprentissage unique et engageante.</p>
             <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
-                <div class="card bg-base-200">
-                    <figure class="px-4 pt-4">
-                        <img src="https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=500" alt="Quiz" class="rounded-xl h-48 w-full object-cover" />
-                    </figure>
+                <div class="card bg-base-200 hover:bg-base-300 transition-colors">
                     <div class="card-body items-center text-center">
-                        <h3 class="card-title"><i class="fas fa-pencil-alt mr-2"></i>Création Simple</h3>
-                        <p>Créez des quiz personnalisés en quelques clics</p>
+                        <h3 class="card-title text-base-content"><i class="fas fa-brain mr-2"></i>Intelligence Artificielle</h3>
+                        <p class="text-base-content/70">Générez des quiz pertinents grâce à notre IA intégrée qui analyse vos besoins et crée du contenu adapté.</p>
                     </div>
                 </div>
-                <div class="card bg-base-200">
-                    <figure class="px-4 pt-4">
-                        <img src="https://images.unsplash.com/photo-1521737604893-d14cc237f11d?w=500" alt="Collaboration" class="rounded-xl h-48 w-full object-cover" />
-                    </figure>
+                <div class="card bg-base-200 hover:bg-base-300 transition-colors">
                     <div class="card-body items-center text-center">
-                        <h3 class="card-title"><i class="fas fa-share-alt mr-2"></i>Partage Facile</h3>
-                        <p>Partagez vos quiz avec votre communauté</p>
+                        <h3 class="card-title text-base-content"><i class="fas fa-users mr-2"></i>Communauté Active</h3>
+                        <p class="text-base-content/70">Rejoignez une communauté passionnée de plus de 15 000 créateurs et apprenants.</p>
                     </div>
                 </div>
-                <div class="card bg-base-200">
-                    <figure class="px-4 pt-4">
-                        <img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=500" alt="Analytics" class="rounded-xl h-48 w-full object-cover" />
-                    </figure>
+                <div class="card bg-base-200 hover:bg-base-300 transition-colors">
                     <div class="card-body items-center text-center">
-                        <h3 class="card-title"><i class="fas fa-chart-line mr-2"></i>Suivi des Progrès</h3>
-                        <p>Analysez vos performances et progressez</p>
+                        <h3 class="card-title text-base-content"><i class="fas fa-chart-line mr-2"></i>Analyses Détaillées</h3>
+                        <p class="text-base-content/70">Suivez votre progression avec des statistiques détaillées et des recommandations personnalisées.</p>
                     </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-16 bg-base-200">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl lg:text-4xl font-bold text-center mb-12 text-base-content">Engagements QuizDown</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div class="bg-base-100 p-6 rounded-lg shadow-lg text-center">
+                    <i class="fas fa-shield-alt text-4xl text-primary mb-4"></i>
+                    <h3 class="font-bold mb-2 text-base-content">Sécurité Garantie</h3>
+                    <p class="text-base-content/70">Vos données sont protégées et cryptées</p>
+                </div>
+                <div class="bg-base-100 p-6 rounded-lg shadow-lg text-center">
+                    <i class="fas fa-clock text-4xl text-secondary mb-4"></i>
+                    <h3 class="font-bold mb-2 text-base-content">Disponibilité 24/7</h3>
+                    <p class="text-base-content/70">Accédez à vos quiz à tout moment</p>
+                </div>
+                <div class="bg-base-100 p-6 rounded-lg shadow-lg text-center">
+                    <i class="fas fa-sync text-4xl text-accent mb-4"></i>
+                    <h3 class="font-bold mb-2 text-base-content">Mises à jour régulières</h3>
+                    <p class="text-base-content/70">Nouvelles fonctionnalités chaque mois</p>
+                </div>
+                <div class="bg-base-100 p-6 rounded-lg shadow-lg text-center">
+                    <i class="fas fa-headset text-4xl text-primary mb-4"></i>
+                    <h3 class="font-bold mb-2 text-base-content">Support réactif</h3>
+                    <p class="text-base-content/70">Réponse sous 24h garantie</p>
                 </div>
             </div>
         </div>
