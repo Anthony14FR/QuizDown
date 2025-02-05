@@ -35,3 +35,50 @@ symfony serve
 # Schéma de la base de données
 ![Database Schema](./bdd.png)
 
+
+# Cahier des Charges - QuizDown
+
+## Objectif
+Plateforme web de quiz interactifs permettant aux administrateurs de créer des quiz et aux utilisateurs d'y participer.
+
+## Fonctionnalités
+
+### Utilisateurs
+- Inscription/Connexion avec validation email
+- Profil
+- Consultation historique des quiz passés
+- Système de badges évolutifs
+- Commentaires sur les quiz
+- Création de quiz personnalisés
+- Réponse aux quiz
+
+### Quiz
+- 3 types: Standard, Chronométré, Pénalités
+- Questions à choix unique/multiple/vrai-faux
+- Système de points configurable
+- Catégories et tags
+- Historique des scores
+- Classement des quiz populaires
+
+### Administration
+- Gestion complète des quiz
+- Modération des commentaires
+- Gestion des utilisateurs
+- Administration des badges
+- Gestion des catégories/tags
+- Génération de quiz via IA
+
+## Aspects Techniques
+- Framework Symfony
+- Base de données MySQL
+- Interface Twig/Tailwind/DaisyUI
+- Docker pour l'environnement
+- API OpenAI pour génération
+
+## Contraintes
+- Interface responsive
+- Validation stricte des données
+- Protection CSRF
+- Rôles utilisateurs distincts
+- Tests automatisés
+
