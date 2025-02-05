@@ -364,7 +364,7 @@ class QuizController extends AbstractController
         $comment = new Comment();
         $comment->setQuiz($quiz);
         $comment->setAuthor($this->getUser() instanceof User ? $this->getUser() : null);
-        $comment->setCreatedAt(new \DateTimeImmutable());
+        $comment->setCreatedAt(new \DateTimeImmutable('now', new \DateTimeZone('Europe/Paris')));
 
         $form = $this->createForm(CommentType::class, $comment);
         $form->handleRequest($request);

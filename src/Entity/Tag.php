@@ -13,7 +13,7 @@ class Tag
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    private int $id = 0;
+    private ?int $id = 0;
 
     #[ORM\Column(length: 25, nullable: false)]
     private ?string $name = null;

@@ -18,8 +18,13 @@
                 {{ form_row(form.penaltyPoints, {'attr': {'class': 'input input-bordered w-full'}}) }}
                 {{ form_row(form.timePenalty, {'attr': {'class': 'input input-bordered w-full'}}) }}
             </div>
-            {{ form_row(form.categories) }}
-            {{ form_row(form.tags) }}
+            {{ form_row(form.categories, {
+            'attr': {'class': 'select select-bordered w-full min-h-16', 'multiple': 'multiple', 'size': '5'}
+            }) }}
+
+            {{ form_row(form.tags, {
+            'attr': {'class': 'select select-bordered w-full min-h-16', 'multiple': 'multiple', 'size': '5'}  
+            }) }}
             {{ form_row(form.defaultScore, {'attr': {'class': 'input input-bordered w-full'}}) }}
             {{ form_row(form.description, {'attr': {'class': 'textarea textarea-bordered w-full'}}) }}
         </div>
@@ -74,8 +79,6 @@
                     <option value="single_choice">Choix unique</option>
                     <option value="multiple_choice">Choix multiple</option>
                 </select>
-                <input type="number" name="quiz[questions][__name__][difficulty]" 
-                       class="input input-bordered w-full mb-4" value="1" min="1" max="5">
 
                 <div class="answers-collection mt-3" data-index="0">
                     <h5 class="font-bold mb-2">Réponses</h5>

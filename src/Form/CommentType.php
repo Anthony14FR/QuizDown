@@ -19,10 +19,12 @@ class CommentType extends AbstractType
             ->add('author', EntityType::class, [
                 'class' => User::class,
                 'choice_label' => 'username',
+                'mapped' => false
             ])
             ->add('quiz', EntityType::class, [
                 'class' => Quiz::class,
                 'choice_label' => 'title',
+                'mapped' => false
             ])
         ;
     }
