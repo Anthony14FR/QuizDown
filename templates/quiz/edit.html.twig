@@ -22,7 +22,7 @@
             }) }}
 
             {{ form_row(form.tags, {
-            'attr': {'class': 'select select-bordered w-full min-h-16', 'multiple': 'multiple', 'size': '5'}  
+            'attr': {'class': 'select select-bordered w-full min-h-16', 'multiple': 'multiple', 'size': '5'}
             }) }}
             {{ form_row(form.defaultScore, {'attr': {'class': 'input input-bordered w-full'}}) }}
             {{ form_row(form.description, {'attr': {'class': 'textarea textarea-bordered w-full'}}) }}
@@ -30,13 +30,13 @@
 
         <div class="questions-wrapper mt-4">
             <h3 class="text-xl font-bold mb-4">Questions</h3>
-            <div class="questions-collection" 
+            <div class="questions-collection"
                  data-index="{{ form.questions|length > 0 ? form.questions|length : 0 }}">
                 {% for questionForm in form.questions %}
                     <div class="question-item card bg-base-200 p-6 mb-4" data-index="{{ loop.index0 }}">
                         {{ form_row(questionForm.content, {'attr': {'class': 'input input-bordered w-full mb-4'}}) }}
                         {{ form_row(questionForm.type, {'attr': {'class': 'select select-bordered w-full mb-4'}}) }}
-                        
+
                         <div class="answers-collection" data-index="{{ questionForm.answers|length }}">
                             <h5 class="font-bold mb-2">Réponses</h5>
                             {% for answerForm in questionForm.answers %}
@@ -71,7 +71,7 @@
 
         <template id="question-template">
             <div class="question-item card bg-base-200 p-6 mb-4">
-                <input type="text" name="quiz[questions][__name__][content]" required 
+                <input type="text" name="quiz[questions][__name__][content]" required
                        class="input input-bordered w-full mb-4" placeholder="Votre question">
                 <select name="quiz[questions][__name__][type]" class="select select-bordered w-full mb-4">
                     <option value="true_false">Vrai / Faux</option>
@@ -94,7 +94,7 @@
 
         <template id="answer-template">
             <div class="answer-item bg-base-100 p-3 rounded-lg mb-2">
-                <input type="text" name="quiz[questions][__question_name__][answers][__name__][content]" 
+                <input type="text" name="quiz[questions][__question_name__][answers][__name__][content]"
                     required class="input input-bordered w-full mb-2" placeholder="Votre réponse">
                 <div class="flex items-center gap-2">
                     <input type="radio"
@@ -188,6 +188,14 @@
                     }
                     this.wasChecked = this.checked;
                 });
+
+                const questionTypeSelect = answersCollection.closest('.question-item').querySelector('select[name*="[type]"]');
+                if (questionTypeSelect && questionTypeSelect.value === 'true_false') {
+                    answerBlock.querySelector('input[type="text"]').value = answerIndex === 0 ? 'Vrai' : 'Faux';
+                    if (answerIndex === 0) {
+                        newRadio.checked = true;
+                    }
+                }
 
                 answersCollection.appendChild(newAnswer);
                 answersCollection.dataset.index = answerIndex + 1;
