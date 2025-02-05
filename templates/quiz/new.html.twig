@@ -40,10 +40,14 @@
                         </div>
                     </div>
                     <div class="mb-4">
-                        {{ form_row(form.categories) }}
+                        {{ form_row(form.categories, {
+                            'attr': {'class': 'select select-bordered w-full min-h-16', 'multiple': 'multiple', 'size': '5'}
+                        }) }}
                     </div>
                     <div class="mb-4">
-                        {{ form_row(form.tags) }}
+                        {{ form_row(form.tags, {
+                        'attr': {'class': 'select select-bordered w-full min-h-16', 'multiple': 'multiple', 'size': '5'}  
+                        }) }}
                     </div>
                     <div class="col-md-3">
                         {{ form_row(form.defaultScore, {

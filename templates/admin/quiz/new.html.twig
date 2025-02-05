@@ -41,10 +41,14 @@
                         </div>
                     </div>
                     <div class="mb-4">
-                        {{ form_row(form.categories) }}
+                        {{ form_row(form.categories, {
+                            'attr': {'class': 'select select-bordered w-full min-h-16', 'multiple': 'multiple', 'size': '5'}
+                        }) }}
                     </div>
                     <div class="mb-4">
-                        {{ form_row(form.tags) }}
+                        {{ form_row(form.tags, {
+                            'attr': {'class': 'select select-bordered w-full min-h-16', 'multiple': 'multiple', 'size': '5'}  
+                        }) }}
                     </div>
                     <div class="col-md-3">
                         {{ form_row(form.defaultScore, {
@@ -113,16 +117,14 @@
                 <input type="text" name="quiz[questions][__question_name__][answers][__name__][content]" 
                     required class="input input-bordered w-full mb-2" placeholder="Votre réponse">
                 <div class="flex items-center gap-2">
-                    <div class="form-control">
-                        <input type="radio"
-                            id="quiz_questions___question_name___answers___name___isCorrect"
-                            name="quiz[questions][__question_name__][answers][__name__][isCorrect]"
-                            class="checkbox"
-                            value="1">
-                        <label class="cursor-pointer" for="quiz_questions___question_name___answers___name___isCorrect">
-                            Bonne réponse
-                        </label>
-                    </div>
+                    <input type="radio"
+                        id="quiz_questions___question_name___answers___name___isCorrect"
+                        name="quiz[questions][__question_name__][answers][__name__][isCorrect]"
+                        class="checkbox"
+                        value="1">
+                    <label class="cursor-pointer" for="quiz_questions___question_name___answers___name___isCorrect">
+                        Bonne réponse
+                    </label>
                 </div>
                 <button type="button" class="btn btn-error btn-sm mt-2 remove-answer">Supprimer</button>
             </div>
