@@ -88,13 +88,6 @@ class QuizType extends AbstractType
                 'required' => false,
                 'data' => $options['penalty_points'] ?? null,
             ])
-            ->add('timeLimit', IntegerType::class, [
-                'label' => 'Temps par question (en secondes)',
-                'attr' => ['class' => 'form-control'],
-                'mapped' => false,
-                'required' => false,
-                'data' => $options['timeLimit'] ?? null,
-            ])
         ;
     }
 
