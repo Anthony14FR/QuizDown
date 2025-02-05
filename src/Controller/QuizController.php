@@ -123,6 +123,30 @@ class QuizController extends AbstractController
                 $tag->addQuiz($quiz);
             }
 
+            if ($quiz->getQuestions()->count() < 1) {
+                $this->addFlash('error', 'Le quiz doit avoir au moins une question.');
+
+                return $this->redirectToRoute('app_quiz_new');
+            }
+
+            foreach ($quiz->getQuestions() as $question) {
+                if ('multiple_choice' === $question->getType()) {
+                    $correctAnswers = $question->getAnswers()->filter(fn ($a) => $a->isCorrect());
+                    if ($correctAnswers->count() < 2) {
+                        $this->addFlash('error', 'Les questions à choix multiple doivent avoir au moins deux réponses correctes.');
+
+                        return $this->redirectToRoute('app_quiz_new');
+                    }
+                }
+            }
+
+            $correctAnswers = $quiz->getQuestions()->map(fn ($q) => $q->getAnswers()->filter(fn ($a) => $a->isCorrect())->count());
+            if ($correctAnswers->contains(0)) {
+                $this->addFlash('error', 'Toutes les questions doivent avoir au moins une réponse correcte.');
+
+                return $this->redirectToRoute('app_quiz_new');
+            }
+
             $quiz->defaultScore = $quizData['defaultScore'] > 0 ? $quizData['defaultScore'] : 1;
 
             $entityManager->persist($quiz);
@@ -214,6 +238,30 @@ class QuizController extends AbstractController
                 if (!$tag->getQuizzes()->contains($quiz)) {
                     $tag->addQuiz($quiz);
                 }
+            }
+
+            if ($quiz->getQuestions()->count() < 1) {
+                $this->addFlash('error', 'Le quiz doit avoir au moins une question.');
+
+                return $this->redirectToRoute('app_quiz_edit', ['id' => $quiz->getId()]);
+            }
+
+            foreach ($quiz->getQuestions() as $question) {
+                if ('multiple_choice' === $question->getType()) {
+                    $correctAnswers = $question->getAnswers()->filter(fn ($a) => $a->isCorrect());
+                    if ($correctAnswers->count() < 2) {
+                        $this->addFlash('error', 'Les questions à choix multiple doivent avoir au moins deux réponses correctes.');
+
+                        return $this->redirectToRoute('app_quiz_edit', ['id' => $quiz->getId()]);
+                    }
+                }
+            }
+
+            $correctAnswers = $quiz->getQuestions()->map(fn ($q) => $q->getAnswers()->filter(fn ($a) => $a->isCorrect())->count());
+            if ($correctAnswers->contains(0)) {
+                $this->addFlash('error', 'Toutes les questions doivent avoir au moins une réponse correcte.');
+
+                return $this->redirectToRoute('app_quiz_edit', ['id' => $quiz->getId()]);
             }
 
             $quiz->defaultScore = $quiz->defaultScore > 0 ? $quiz->defaultScore : 1;
