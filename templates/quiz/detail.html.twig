@@ -6,22 +6,28 @@
             <div class="card-body">
                 <h1 class="card-title text-2xl mb-4">{{ quiz.title }}</h1>
                 <p class="text-lg mb-4">{{ quiz.description }}</p>
-                <div class="flex gap-4 text-sm opacity-70">
+                <div class="flex flex-col gap-4 text-sm opacity-70">
                     <p>{{ quiz.questions|length }} questions</p>
                     <p>Créé par {{ quiz.creator.username }}</p>
                     {% if quiz.categories|length > 0 %}
-                        <p>Catégories: 
-                            {% for category in quiz.categories %}
-                                {{ category.name }}{{ not loop.last ? ', ' }}
-                            {% endfor %}
-                        </p>
+                        <div>
+                            <p class="mb-2">Catégories:</p>
+                            <div class="flex flex-wrap gap-2">
+                                {% for category in quiz.categories %}
+                                    <div class="badge badge-accent">{{ category.name }}</div>
+                                {% endfor %}
+                            </div>
+                        </div>
                     {% endif %}
                     {% if quiz.tags|length > 0 %}
-                        <p>Tags: 
-                            {% for tag in quiz.tags %}
-                                {{ tag.name }}{{ not loop.last ? ', ' }}
-                            {% endfor %}
-                        </p>
+                        <div>
+                            <p class="mb-2">Tags:</p>
+                            <div class="flex flex-wrap gap-2">
+                                {% for tag in quiz.tags %}
+                                    <div class="badge badge-outline">{{ tag.name }}</div>
+                                {% endfor %}
+                            </div>
+                        </div>
                     {% endif %}
                 </div>
                 <div class="mt-6 flex gap-2 justify-center">
@@ -40,14 +46,14 @@
                         <div class="flex justify-between items-start">
                             <div class="flex-1">
                                 <p class="text-sm opacity-70 mb-2">
-                                    Par {{ comment.author.username }} 
+                                    Par {{ comment.author.username }}
                                     le {{ comment.createdAt|date('d/m/Y à H:i') }}
                                 </p>
                                 <p>{{ comment.content }}</p>
                             </div>
                             {% if is_granted('ROLE_ADMIN') or app.user == comment.author %}
                                 <div class="flex gap-2">
-                                    <form method="post" action="{{ path('app_comment_delete', {'id': comment.id}) }}" 
+                                    <form method="post" action="{{ path('app_comment_delete', {'id': comment.id}) }}"
                                           onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce commentaire ?');">
                                         <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ comment.id) }}">
                                         <button type="submit" class="btn btn-error btn-sm">Supprimer</button>
@@ -66,22 +72,21 @@
             <div class="mt-6">
                 <h3 class="text-lg font-bold mb-4">Ajouter un commentaire</h3>
                 {{ form_start(commentForm, {'action': path('app_quiz_comment', {'id': quiz.id})}) }}
-                    {{ form_widget(commentForm.content, {
-                        'attr': {
-                            'class': 'textarea textarea-bordered w-full',
-                            'rows': 3,
-                            'placeholder': 'Votre commentaire...',
-                            'label': false
-                        }
-                    }) }}
+                {{ form_widget(commentForm.content, {
+                    'attr': {
+                        'class': 'textarea textarea-bordered w-full',
+                        'rows': 3,
+                        'placeholder': 'Votre commentaire...',
+                        'label': false
+                    }
+                }) }}
 
-                    {# Cacher les autres champs mais les garder dans le form #}
-                    <div style="display: none;">
-                        {{ form_row(commentForm.author) }}
-                        {{ form_row(commentForm.quiz) }}
-                    </div>
+                <div style="display: none;">
+                    {{ form_row(commentForm.author) }}
+                    {{ form_row(commentForm.quiz) }}
+                </div>
 
-                    <button type="submit" class="btn btn-primary mt-2">Publier</button>
+                <button type="submit" class="btn btn-primary mt-2">Publier</button>
                 {{ form_end(commentForm) }}
             </div>
         {% endif %}
