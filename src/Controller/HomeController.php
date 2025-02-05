@@ -2,16 +2,16 @@
 
 namespace App\Controller;
 
-use Doctrine\ORM\EntityManagerInterface;
-use App\Repository\QuizRepository;
-use App\Repository\CategoryRepository;
-use App\Repository\TagRepository;
+use App\Entity\Submission;
 use App\Entity\User;
+use App\Repository\CategoryRepository;
+use App\Repository\QuizRepository;
+use App\Repository\TagRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-use App\Entity\Submission;
 
 class HomeController extends AbstractController
 {
@@ -44,7 +44,7 @@ class HomeController extends AbstractController
 
         return $this->render('home/index.html.twig', [
             'stats' => $stats,
-            'popular_quizzes' => $this->quizRepository->findMostPlayed()
+            'popular_quizzes' => $this->quizRepository->findMostPlayed(),
         ]);
     }
 }
