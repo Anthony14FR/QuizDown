@@ -26,6 +26,27 @@ class AdminFixtures extends Fixture
         $admin->setIsVerified(true);
 
         $manager->persist($admin);
+
+        $user = new User();
+        $user->setEmail('user@orus.com');
+        $user->setUsername('user');
+        $user->setRoles(['ROLE_USER']);
+        $user->setPassword($this->hasher->hashPassword($user, 'User123'));
+        $user->setIsVerified(true);
+
+        $manager->persist($user);
+
+        for ($i = 1; $i <= 5; ++$i) {
+            $user = new User();
+            $user->setEmail("user{$i}@orus.com");
+            $user->setUsername("user{$i}");
+            $user->setRoles(['ROLE_USER']);
+            $user->setPassword($this->hasher->hashPassword($user, "User{$i}123"));
+            $user->setIsVerified(true);
+
+            $manager->persist($user);
+        }
+
         $manager->flush();
     }
 }
