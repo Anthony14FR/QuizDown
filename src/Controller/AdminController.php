@@ -550,7 +550,9 @@ class AdminController extends AbstractController
     public function newUser(Request $request, EntityManagerInterface $em, UserPasswordHasherInterface $passwordHasher): Response
     {
         $user = new User();
-        $form = $this->createForm(UserType::class, $user);
+        $form = $this->createForm(UserType::class, $user, [
+            'validation_groups' => ['Default', 'creation'],
+        ]);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -574,7 +576,10 @@ class AdminController extends AbstractController
     #[Route('/user/{id}/edit', name: 'app_admin_user_edit')]
     public function editUser(User $user, Request $request, EntityManagerInterface $em, UserPasswordHasherInterface $passwordHasher): Response
     {
-        $form = $this->createForm(UserType::class, $user, ['is_edit' => true]);
+        $form = $this->createForm(UserType::class, $user, [
+            'is_edit' => true,
+            'validation_groups' => ['Default'],
+        ]);
         $originalPassword = $user->getPassword();
 
         $form->handleRequest($request);

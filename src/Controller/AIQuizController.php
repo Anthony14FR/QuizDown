@@ -51,7 +51,7 @@ class AIQuizController extends AbstractController
                 'messages' => [
                     [
                         'role' => 'system',
-                        'content' => 'Tu dois générer un quiz au format JSON avec la structure suivante: {title: string, description: string, questions: [{content: string, type: string (true_false, single_choice, multiple_choice), answers: [{content: string, isCorrect: boolean}]}]}',
+                        'content' => 'Tu dois générer un quiz au format JSON avec la structure suivante: {title: string, description: string, questions: [{content: string, type: string (true_false, single_choice, multiple_choice), answers: [{content: string, isCorrect: boolean}]}]} Fait bien attention à ce que la question et ses réponses correspondent à sont type de questions',
                     ],
                     [
                         'role' => 'user',
