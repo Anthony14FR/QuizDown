@@ -267,7 +267,7 @@ class QuizController extends AbstractController
         $answers = $request->request->all('answers');
         $score = 0;
         $currentUser = $this->getUser();
-        
+
         $submission = new Submission();
         $submission->setQuiz($quiz);
         $submission->setPlayer($currentUser instanceof User ? $currentUser : null);
@@ -296,7 +296,7 @@ class QuizController extends AbstractController
                     }
                 }
             }
-            
+
             $submissionAnswer->setIsCorrect($isCorrect);
             $em->persist($submissionAnswer);
         }

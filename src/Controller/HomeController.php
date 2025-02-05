@@ -30,6 +30,10 @@ class HomeController extends AbstractController
             return $this->render('home/landing.html.twig');
         }
 
+        if ($this->isGranted('ROLE_BANNED')) {
+            return $this->redirectToRoute('app_logout');
+        }
+
         $stats = [
             'total_quizzes' => $this->quizRepository->count([]),
             'total_users' => $this->entityManager->getRepository(User::class)->count([]),

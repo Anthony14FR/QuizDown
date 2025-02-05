@@ -31,6 +31,7 @@ class UserType extends AbstractType
             ])
             ->add('password', PasswordType::class, [
                 'required' => !$options['is_edit'],
+                'mapped' => !$options['is_edit'],
                 'empty_data' => '',
             ])
             ->add('isVerified', CheckboxType::class, [
