@@ -195,6 +195,24 @@ class AdminController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            if (empty($category->getName())) {
+                $this->addFlash('error', 'Le nom de la catégorie ne peut pas être vide');
+
+                return $this->redirectToRoute('app_admin_category_new');
+            }
+
+            if (strlen($category->getName()) > 25) {
+                $this->addFlash('error', 'Le nom de la catégorie ne peut pas dépasser 25 caractères');
+
+                return $this->redirectToRoute('app_admin_category_new');
+            }
+
+            if ($em->getRepository(Category::class)->findOneBy(['name' => $category->getName()])) {
+                $this->addFlash('error', 'La catégorie existe déjà');
+
+                return $this->redirectToRoute('app_admin_category_new');
+            }
+
             $em->persist($category);
             $em->flush();
 
@@ -216,6 +234,25 @@ class AdminController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            if (empty($category->getName())) {
+                $this->addFlash('error', 'Le nom de la catégorie ne peut pas être vide');
+
+                return $this->redirectToRoute('app_admin_category_edit', ['id' => $category->getId()]);
+            }
+
+            if (strlen($category->getName()) > 25) {
+                $this->addFlash('error', 'Le nom de la catégorie ne peut pas dépasser 25 caractères');
+
+                return $this->redirectToRoute('app_admin_category_edit', ['id' => $category->getId()]);
+            }
+
+            $categoryExist = $em->getRepository(Category::class)->findOneBy(['name' => $category->getName()]);
+            if ($categoryExist && $categoryExist->getId() != $category->getId()) {
+                $this->addFlash('error', 'La catégorie existe déjà');
+
+                return $this->redirectToRoute('app_admin_category_edit', ['id' => $category->getId()]);
+            }
+
             $em->flush();
             $this->addFlash('success', 'Catégorie modifiée avec succès');
 
@@ -260,6 +297,25 @@ class AdminController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            if (null == $tag->getName() || empty($tag->getName())) {
+                $this->addFlash('error', 'Le nom du tag ne peut pas être vide');
+
+                return $this->redirectToRoute('app_admin_tag_new');
+            }
+
+            if (strlen($tag->getName()) > 25) {
+                $this->addFlash('error', 'Le nom du tag ne peut pas dépasser 25 caractères');
+
+                return $this->redirectToRoute('app_admin_tag_new');
+            }
+
+            $tagExist = $em->getRepository(Tag::class)->findOneBy(['name' => $tag->getName()]);
+            if ($tagExist) {
+                $this->addFlash('error', 'Le tag existe déjà');
+
+                return $this->redirectToRoute('app_admin_tag_new');
+            }
+
             $em->persist($tag);
             $em->flush();
 
@@ -281,6 +337,25 @@ class AdminController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            if (empty($tag->getName())) {
+                $this->addFlash('error', 'Le nom du tag ne peut pas être vide');
+
+                return $this->redirectToRoute('app_admin_tag_edit', ['id' => $tag->getId()]);
+            }
+
+            if (strlen($tag->getName()) > 25) {
+                $this->addFlash('error', 'Le nom du tag ne peut pas dépasser 25 caractères');
+
+                return $this->redirectToRoute('app_admin_tag_edit', ['id' => $tag->getId()]);
+            }
+
+            $tagExist = $em->getRepository(Tag::class)->findOneBy(['name' => $tag->getName()]);
+            if ($tagExist && $tagExist->getId() != $tag->getId()) {
+                $this->addFlash('error', 'Le tag existe déjà');
+
+                return $this->redirectToRoute('app_admin_tag_edit', ['id' => $tag->getId()]);
+            }
+
             $em->flush();
             $this->addFlash('success', 'Tag modifié avec succès');
 
@@ -390,6 +465,18 @@ class AdminController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            if (empty($comment->getContent())) {
+                $this->addFlash('error', 'Vous devez être connecté pour commenter.');
+
+                return $this->redirectToRoute('app_admin_comment_new');
+            }
+
+            if (strlen($comment->getContent()) < 5 || strlen($comment->getContent()) > 200) {
+                $this->addFlash('error', 'Le commentaire doit contenir entre 5 et 200 caractères.');
+
+                return $this->redirectToRoute('app_admin_comment_new');
+            }
+
             $comment->setCreatedAt(new \DateTimeImmutable('now', new \DateTimeZone('Europe/Paris')));
             $em->persist($comment);
             $em->flush();
@@ -412,6 +499,18 @@ class AdminController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            if (empty($comment->getContent())) {
+                $this->addFlash('error', 'Vous devez être connecté pour commenter.');
+
+                return $this->redirectToRoute('app_admin_comment_edit', ['id' => $comment->getId()]);
+            }
+
+            if (strlen($comment->getContent()) < 5 || strlen($comment->getContent()) > 200) {
+                $this->addFlash('error', 'Le commentaire doit contenir entre 5 et 200 caractères.');
+
+                return $this->redirectToRoute('app_admin_comment_edit', ['id' => $comment->getId()]);
+            }
+
             $em->flush();
             $this->addFlash('success', 'Commentaire modifié avec succès');
 

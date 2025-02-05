@@ -38,9 +38,9 @@ class Comment
         return $this->content;
     }
 
-    public function setContent(string $content): static
+    public function setContent(?string $content): static
     {
-        $this->content = $content;
+        $this->content = $content ?? '';
 
         return $this;
     }

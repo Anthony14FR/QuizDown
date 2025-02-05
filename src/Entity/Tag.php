@@ -13,9 +13,9 @@ class Tag
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    private ?int $id = 0;
+    private int $id = 0;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 25, nullable: false)]
     private ?string $name = null;
 
     /**
@@ -39,9 +39,9 @@ class Tag
         return $this->name;
     }
 
-    public function setName(string $name): static
+    public function setName(?string $name): static
     {
-        $this->name = $name;
+        $this->name = $name ?? '';
 
         return $this;
     }
