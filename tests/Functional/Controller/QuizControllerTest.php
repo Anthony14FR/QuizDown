@@ -64,7 +64,6 @@ class QuizControllerTest extends WebTestCase
                     0 => [
                         'type' => 'single_choice',
                         'content' => 'What is 2+2?',
-                        'difficulty' => 1,
                         'answers' => [
                             0 => [
                                 'content' => '4',
