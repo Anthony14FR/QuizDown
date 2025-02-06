@@ -39,7 +39,7 @@
                                               name="answers[{{ question.id }}]"
                                               value="{{ answer.id }}"
                                               class="radio"
-                                              required>
+                                              {% if quiz.type == 'base' %}required{% endif %}>
                                        <span>{{ answer.content }}</span>
                                    </label>
                                {% endfor %}

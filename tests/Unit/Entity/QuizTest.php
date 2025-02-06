@@ -27,7 +27,6 @@ class QuizTest extends TestCase
         $question = new Question();
         $question->setContent('Test Question');
         $question->setType('single_choice');
-        $question->setDifficulty(1);
 
         $this->quiz->addQuestion($question);
 
